@@ -1,0 +1,133 @@
+.login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(111, 15, 175, 0.2);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(111, 15, 175, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header img {
+  margin-bottom: 1.5rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  align-items: center;
+}
+
+.form-group {
+  position: relative;
+  width: 80%;
+  margin-bottom: 1rem;
+}
+
+.form-group input {
+  width: 100%;
+  height: 2rem;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border: 1px solid rgba(111, 15, 175, 0.2);
+  border-radius: 8px;
+  color: #333333;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.form-group label {
+  position: absolute;
+  left: 10px;
+  top: -8px;
+  padding: 0 5px;
+  background-color: white;
+  color: #6F0FAF;
+  font-size: 0.8rem;
+  z-index: 1;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #6F0FAF;
+  background: #fff;
+}
+
+.form-group input:focus + label {
+  color: #6F0FAF;
+}
+
+/* Remover estilos não mais necessários */
+.form-group input:focus ~ label,
+.form-group input:not(:placeholder-shown) ~ label {
+  transform: none;
+}
+
+.login-button {
+  width: 80%;
+  background: linear-gradient(45deg, #6F0FAF, #A388FF);
+  color: white;
+  height: 2.8rem;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(111, 15, 175, 0.3);
+}
+
+.error-message {
+  color: #ff4d4d;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Remover a seção de link de cadastro */
+.register-link {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1rem;
+  }
+
+  .login-card {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .login-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .login-form {
+    gap: 1.5rem;
+  }
+}
