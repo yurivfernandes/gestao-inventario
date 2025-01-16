@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,9 +13,14 @@ class EquipamentoListCreate(APIView):
         try:
             site_id = request.query_params.get("site")
             cliente_id = request.query_params.get("cliente")
+            site_codigo = request.query_params.get("site_codigo")
 
             if site_id:
                 equipamentos = Equipamento.objects.filter(site_id=site_id)
+            elif site_codigo:
+                equipamentos = Equipamento.objects.filter(
+                    site__codigo_vivo=site_codigo
+                )
             elif cliente_id:
                 equipamentos = Equipamento.objects.filter(
                     site__cliente_id=cliente_id
@@ -22,8 +28,19 @@ class EquipamentoListCreate(APIView):
             else:
                 equipamentos = Equipamento.objects.all()
 
-            serializer = EquipamentoSerializer(equipamentos, many=True)
-            return Response(serializer.data)
+            paginator = Paginator(equipamentos, 50)  # 50 registros por página
+            page_number = request.query_params.get("page")
+            page_obj = paginator.get_page(page_number)
+
+            serializer = EquipamentoSerializer(page_obj, many=True)
+            return Response(
+                {
+                    "count": paginator.count,
+                    "num_pages": paginator.num_pages,
+                    "current_page": page_obj.number,
+                    "results": serializer.data,
+                }
+            )
         except ValidationError as e:
             return Response(
                 {"error": str(e)}, status=status.HTTP_400_BAD_REQUEST
