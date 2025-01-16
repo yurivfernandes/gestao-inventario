@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     "django_filters",  # Adicionar Django Filters
     "rest_framework.authtoken",  # Adicionar esta linha
     "access",
+    "inventario",
+    "incidentes",
 ]
 
 MIDDLEWARE = [
@@ -141,6 +143,29 @@ CORS_ALLOW_ALL_ORIGINS = True  # Apenas para desenvolvimento
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 # Configurações do REST Framework

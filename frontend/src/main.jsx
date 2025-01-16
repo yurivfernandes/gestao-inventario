@@ -5,6 +5,8 @@ import './index.css';
 import LoginPage from './pages/LoginPage';
 import WelcomePage from './pages/WelcomePage';
 import PasswordPage from './pages/PasswordPage';
+import InventoryPage from './pages/InventoryPage';
+import IncidentManagementPage from './pages/IncidentManagementPage';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -28,6 +30,22 @@ ReactDOM.render(
             element={
               <ProtectedRoute>
                 <PasswordPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/inventario"
+            element={
+              <ProtectedRoute>
+                <InventoryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/incidentes"
+            element={
+              <ProtectedRoute>
+                <IncidentManagementPage />
               </ProtectedRoute>
             }
           />
