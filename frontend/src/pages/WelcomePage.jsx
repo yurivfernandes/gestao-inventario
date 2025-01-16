@@ -13,7 +13,7 @@ import {
 } from 'react-icons/fa';
 
 function WelcomePage() {
-  const { user } = useAuth();
+  const { userData } = useAuth();
 
   useEffect(() => {
     document.title = 'Gestão de Inventário | Home';
@@ -60,9 +60,9 @@ function WelcomePage() {
           <div className="shape shape-3"></div>
         </div>
         <header className="welcome-header">
-          <h1>Bem-vindo ao Gestão de Inventário!</h1>
+          <h1>Bem-vindo ao Sistema de Gestão de Inventário{userData?.first_name ? `, ${userData.first_name}` : ''}!</h1>
           <p className="welcome-subtitle">
-            Selecione uma das opções abaixo para começar sua jornada
+            Selecione uma das opções abaixo para começar sua jornada:
           </p>
         </header>
         
