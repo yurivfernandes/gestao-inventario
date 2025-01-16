@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaUserCog, FaDatabase, FaChartBar, FaSignOutAlt, FaKey, FaThLarge } from 'react-icons/fa';
+import { FaUserCog, FaDatabase, FaChartBar, FaSignOutAlt, FaKey, FaThLarge, FaUser } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/logo.svg';
 import './../../styles//Header.css';
 
 function Header() {
-  const { logout } = useAuth();
+  const { logout, userData } = useAuth();
   const navigate = useNavigate();
 
   const menuItems = [
@@ -66,6 +66,10 @@ function Header() {
             ))}
             <li className="app-menu-divider" />
             <li className="app-menu-item">
+              <span className="user-name">
+                <FaUser />
+                <span>{`${userData?.first_name || ''} ${userData?.last_name || ''}`}</span>
+              </span>
               <button onClick={() => logout()} className="app-logout">
                 <FaSignOutAlt />
                 <span>Sair</span>

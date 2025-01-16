@@ -121,3 +121,16 @@ def profile_update(request):
         return Response(
             {"message": str(e)}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_user_data(request):
+    user = request.user
+    return Response(
+        {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "username": user.username,
+        }
+    )
