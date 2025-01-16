@@ -11,22 +11,28 @@ from ..serializers import EquipamentoSerializer
 class EquipamentoListCreate(APIView):
     def get(self, request):
         try:
-            site_id = request.query_params.get("site")
             cliente_id = request.query_params.get("cliente")
-            site_codigo = request.query_params.get("site_codigo")
+            site_id = request.query_params.get("site")
+
+            if not cliente_id:
+                return Response(
+                    {"error": "Cliente é obrigatório"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            equipamentos = Equipamento.objects.filter(
+                site__cliente_id=cliente_id
+            )
 
             if site_id:
-                equipamentos = Equipamento.objects.filter(site_id=site_id)
-            elif site_codigo:
-                equipamentos = Equipamento.objects.filter(
-                    site__codigo_vivo=site_codigo
+                equipamentos = equipamentos.filter(site_id=site_id)
+
+            search = request.query_params.get("search")
+            if search:
+                equipamentos = equipamentos.filter(
+                    Q(designador__icontains=search)
+                    | Q(codigo__icontains=search)
                 )
-            elif cliente_id:
-                equipamentos = Equipamento.objects.filter(
-                    site__cliente_id=cliente_id
-                )
-            else:
-                equipamentos = Equipamento.objects.all()
 
             paginator = Paginator(equipamentos, 50)  # 50 registros por página
             page_number = request.query_params.get("page")
