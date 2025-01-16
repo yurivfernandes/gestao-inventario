@@ -1,0 +1,159 @@
+/* Reset específico para o header */
+.app-header *,
+.app-header *::before,
+.app-header *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Header principal */
+.app-header {
+  background: linear-gradient(90deg, rgba(107, 70, 193, 0.95), rgba(216, 51, 125, 0.95));
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  z-index: 9999;
+}
+
+.app-header-content {
+  max-width: 1920px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.app-logo {
+  height: 40px;
+}
+
+.app-logo img {
+  height: 100%;
+  width: auto;
+}
+
+/* Menu de navegação */
+.app-nav {
+  height: 100%;
+}
+
+.app-menu {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 2rem;
+}
+
+.app-menu-divider {
+  width: 1px;
+  height: 24px;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 0 1rem;
+}
+
+.app-menu li a,
+.app-logout {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-menu li a svg,
+.app-logout svg {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.app-menu li a:hover,
+.app-logout:hover {
+  color: white;
+}
+
+.app-menu li a:hover svg,
+.app-logout:hover svg {
+  opacity: 1;
+}
+
+.app-logout {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.app-menu-item {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.app-menu-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+}
+
+.app-submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: rgba(107, 70, 193, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 4px;
+  min-width: 200px;
+  display: none;
+  list-style: none;
+  padding: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.has-submenu:hover .app-submenu {
+  display: block;
+}
+
+.app-submenu li a {
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.app-submenu li a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .app-header-content {
+    padding: 0 1rem;
+  }
+
+  .app-menu {
+    gap: 1rem;
+  }
+
+  .app-menu-divider {
+    width: 100%;
+    height: 1px;
+    margin: 0.5rem 0;
+  }
+}

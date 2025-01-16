@@ -9,8 +9,9 @@ from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from .forms import CustomUserCreationForm
@@ -34,34 +35,22 @@ def signup(request):
 
 
 @csrf_exempt
-@require_http_methods(["OPTIONS", "POST"])
+@api_view(["POST"])
+@permission_classes([AllowAny])  # Permite acesso sem autenticação
 def api_login(request):
-    if request.method == "OPTIONS":
-        response = HttpResponse()
-        response["Access-Control-Allow-Origin"] = "*"
-        response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
-        response["Access-Control-Allow-Headers"] = "Content-Type"
-        return response
+    data = request.data
+    username = data.get("username")
+    password = data.get("password")
 
-    if request.method == "POST":
-        data = json.loads(request.body)
-        username = data.get("username")
-        password = data.get("password")
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            response = JsonResponse({"message": "Login successful"})
-        else:
-            response = JsonResponse(
-                {"error": "Invalid credentials"}, status=400
-            )
-
-        response["Access-Control-Allow-Origin"] = "*"
-        return response
-
-    response = JsonResponse({"error": "Invalid request method"}, status=405)
-    response["Access-Control-Allow-Origin"] = "*"
-    return response
+    user = authenticate(username=username, password=password)
+    if user:
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response(
+            {"token": token.key, "user_id": user.id, "username": user.username}
+        )
+    return Response(
+        {"error": "Credenciais inválidas"}, status=status.HTTP_400_BAD_REQUEST
+    )
 
 
 @api_view(["GET"])

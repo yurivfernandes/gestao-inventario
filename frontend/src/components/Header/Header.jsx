@@ -1,77 +1,71 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FaUserCog, FaDatabase, FaChartBar, FaCogs, FaCalculator, FaUserEdit, FaCreditCard, FaKey, FaUsers, FaIndustry, FaBars } from 'react-icons/fa';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaUserCog, FaDatabase, FaChartBar, FaSignOutAlt, FaKey } from 'react-icons/fa';
+import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/logo.svg';
-import './Header.css';
+import './../../styles//Header.css';
 
 function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const menuItems = [
-    {
-      title: 'Perfil',
-      icon: <FaUserCog />,
+    { 
+      icon: <FaUserCog />, 
+      text: "Perfil",
       submenu: [
-        { name: 'Usuário e Senha', icon: <FaKey />, path: '/perfil/senha' }
+        { to: "/perfil/senha", icon: <FaKey />, text: "Alterar Senha" }
       ]
     },
-    {
-      title: 'Inventário',
-      icon: <FaDatabase />,
-      path: '/inventario/'
-    },
-    {
-      title: 'Gestão de Incidentes',
-      icon: <FaChartBar />,
-      path: '/incidentes/gestao-incidentes'
-    }
+    { to: "/inventario", icon: <FaDatabase />, text: "Inventário" },
+    { to: "/incidentes", icon: <FaChartBar />, text: "Gestão de Incidentes" },
   ];
 
   return (
-    <header className="header">
-      <div className="header-content">
-        <Link to="/welcome" className="logo">
-          <img src={logo} alt="Gestão de Inventario" />
+    <header className="app-header">
+      <div className="app-header-content">
+        <Link to="/welcome" className="app-logo">
+          <img src={logo} alt="Logo" />
         </Link>
 
-        <nav className={`nav-menu ${menuOpen ? 'active' : ''}`}>
-          <ul className="menu-items">
+        <nav className="app-nav">
+          <ul className="app-menu">
             {menuItems.map((item, index) => (
-              <li key={index} className="menu-item">
-                {item.submenu ? (
-                  <div className="menu-dropdown">
-                    <button className="dropdown-trigger">
-                      {item.icon}
-                      <span>{item.title}</span>
-                    </button>
-                    <ul className="dropdown-content">
-                      {item.submenu.map((subItem, subIndex) => (
-                        <li key={subIndex}>
-                          <Link to={subItem.path}>
-                            {subItem.icon}
-                            <span>{subItem.name}</span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <Link to={item.path}>
+              <li key={index} className={item.submenu ? 'app-menu-item has-submenu' : 'app-menu-item'}>
+                {item.to ? (
+                  <Link to={item.to}>
                     {item.icon}
-                    <span>{item.title}</span>
+                    <span>{item.text}</span>
                   </Link>
+                ) : (
+                  <div className="app-menu-trigger">
+                    {item.icon}
+                    <span>{item.text}</span>
+                  </div>
+                )}
+                {item.submenu && (
+                  <ul className="app-submenu">
+                    {item.submenu.map((subitem, subindex) => (
+                      <li key={subindex}>
+                        <Link to={subitem.to}>
+                          {subitem.icon}
+                          <span>{subitem.text}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </li>
             ))}
+            <li className="app-menu-divider" />
+            <li className="app-menu-item">
+              <button onClick={() => logout()} className="app-logout">
+                <FaSignOutAlt />
+                <span>Sair</span>
+              </button>
+            </li>
           </ul>
         </nav>
-
-        <button 
-          className="menu-toggle" 
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <FaBars />
-        </button>
       </div>
     </header>
   );

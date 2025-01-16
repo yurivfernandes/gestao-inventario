@@ -1,0 +1,4 @@
+from .cliente_serializer import ClienteSerializer
+from .equipamento_serializer import EquipamentoSerializer
+from .servico_serializer import ServicoSerializer
+from .site_serializer import SiteSerializer

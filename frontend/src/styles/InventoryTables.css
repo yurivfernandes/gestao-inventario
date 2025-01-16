@@ -1,0 +1,258 @@
+.inventory-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+}
+
+.table-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.table-search {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100px;
+}
+
+.filters-container {
+  margin-bottom: 1.5rem;
+}
+
+.filters-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.2rem 1rem;
+  background: #f8fafc;
+  border-radius: 12px 12px 0 0;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  border-bottom: none;
+  transition: all 0.2s;
+  min-height: 40px;
+}
+
+.filters-header:hover {
+  background: #f1f5f9;
+}
+
+.filters-header h3 {
+  font-size: 1rem;
+  color: #4a5568;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filters-header .toggle-icon {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+
+.filters-header .toggle-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.table-filters {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+}
+
+.table-filters.expanded {
+  max-height: 500px;
+  opacity: 1;
+  padding: 1rem;
+  background: #f8fafc;
+}
+
+.filter-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 38px;
+  width: 100%;
+  padding: 1rem;
+}
+
+.filter-field {
+  position: relative;
+  min-width: 180px;
+  margin-bottom: 1rem;
+}
+
+.filter-field label {
+  position: absolute;
+  top: -0.75rem;
+  left: 1rem;
+  padding: 0 0.5rem;
+  background: #f8fafc;
+  font-size: 0.75rem;
+  color: #6B46C1;
+  font-weight: 500;
+  z-index: 1;
+}
+
+.filter-field input,
+.filter-field select {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: white;
+  transition: all 0.2s;
+  appearance: none;
+}
+
+.filter-field input:focus,
+.filter-field select:focus {
+  outline: none;
+  border-color: #6B46C1;
+  box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.1);
+}
+
+.filter-field select {
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,...");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+}
+
+.combobox-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0 0 8px 8px;
+  z-index: 10;
+}
+
+.combobox-option {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.combobox-option:hover {
+  background: #f1f5f9;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 1.5rem;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.inventory-table th {
+  background: #f8fafc;
+  padding: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.inventory-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.inventory-table tr:hover {
+  background: #f8fafc;
+}
+
+.actions-column {
+  width: 50px;
+  text-align: center;
+}
+
+.edit-button {
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  color: #6B46C1;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-button:hover {
+  color: #D8337D;
+  transform: scale(1.1);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #6B46C1;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clear-filters {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.clear-filters:hover {
+  background: #f1f5f9;
+  color: #D8337D;
+}

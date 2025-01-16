@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header/Header';
-import './WelcomePage.css';
+import '../styles/WelcomePage.css';
 import { 
   FaUserCog, 
   FaKey, 
@@ -64,12 +64,12 @@ function WelcomePage() {
           </p>
         </header>
         
-        <main className="cards-grid">
+        <main className="welcome-cards-grid">
           {cards.map((card, index) => (
-            <div key={index} className="card">
-              <div className="card-content">
-                <div className="card-header">
-                  <div className="card-icon">{card.icon}</div>
+            <div key={index} className="welcome-card">
+              <div className="welcome-card-content">
+                <div className="welcome-card-header">
+                  <div className="welcome-card-icon">{card.icon}</div>
                   <h2>{card.title}</h2>
                 </div>
                 <p>{card.description}</p>

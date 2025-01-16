@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/LoginPage.css';
-import logo from '../assets/logo.svg';
+import logo from '../assets/logo_login.svg';
+import api from '../services/api'; // Import the api module
 
 function LoginPage() {
   useEffect(() => {
@@ -16,6 +17,7 @@ function LoginPage() {
     password: ''
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -26,25 +28,25 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    
+    setLoading(true);
+    setError(null);
+
     try {
-      const response = await fetch('http://localhost:8000/access/login/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        login(data.token);
+      const response = await api.post('access/login/', formData);
+      
+      if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        login(response.data.token);
         navigate('/welcome');
       } else {
-        setError('Credenciais inválidas. Por favor, tente novamente.');
+        setError('Resposta inválida do servidor');
+        console.error('Resposta inesperada:', response.data);
       }
-    } catch (error) {
-      setError('Erro ao conectar com o servidor. Tente novamente mais tarde.');
+    } catch (err) {
+      console.error('Erro completo:', err.response?.data || err);
+      setError(err.response?.data?.error || 'Erro ao realizar login');
+    } finally {
+      setLoading(false);
     }
   };
 

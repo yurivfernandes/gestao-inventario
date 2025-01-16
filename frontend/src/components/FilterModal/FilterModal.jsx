@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import './FilterModal.css';
+import '../../styles/FilterModal.css';
 
 function FilterModal({ isOpen, onClose, onApplyFilters, initialFilters }) {
   const [filters, setFilters] = useState(initialFilters);
