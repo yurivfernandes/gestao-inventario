@@ -8,7 +8,8 @@ import {
   FaKey, 
   FaWarehouse, 
   FaClipboardCheck, 
-  FaExclamationTriangle 
+  FaExclamationTriangle,
+  FaThLarge // Importar o ícone do fluxo
 } from 'react-icons/fa';
 
 function WelcomePage() {
@@ -34,7 +35,8 @@ function WelcomePage() {
       active: true,
       icon: <FaWarehouse size={32} />,
       subItems: [
-        { name: 'Acessar Inventário', icon: <FaClipboardCheck size={16} />, path: '/inventario' }
+        { name: 'Acessar Inventário', icon: <FaClipboardCheck size={16} />, path: '/inventario' },
+        { name: 'Fluxo de Inventário', icon: <FaThLarge size={16} />, path: '/inventario/flow' } // Adicionar a nova opção
       ]
     },
     {

@@ -1,12 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Header from '../components/Header/Header';
-import InventoryTables from '../components/Inventory/InventoryTables';
+import InventoryFlow from '../components/Inventory/InventoryFlow';
 import '../styles/InventoryPage.css';
-import { FaUsers, FaBuilding, FaServer, FaCogs } from 'react-icons/fa';
 
-function InventoryPage() {
+function InventoryFlowPage() {
   const { token } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,7 +16,6 @@ function InventoryPage() {
     equipments: {},
     services: {}
   });
-  const [activeTab, setActiveTab] = useState('clients');
 
   useEffect(() => {
     fetchClients();
@@ -64,13 +63,6 @@ function InventoryPage() {
     }
   };
 
-  const tabs = [
-    { id: 'clients', label: 'Clientes', icon: FaUsers },
-    { id: 'sites', label: 'Sites', icon: FaBuilding },
-    { id: 'equipments', label: 'Equipamentos', icon: FaServer },
-    { id: 'services', label: 'Serviços', icon: FaCogs }
-  ];
-
   if (loading) return <div className="loading">Carregando...</div>;
   if (error) return <div className="error">{error}</div>;
 
@@ -78,33 +70,13 @@ function InventoryPage() {
     <>
       <Header />
       <div className="inventory-container">
-        <div className="inventory-tabs">
-          {tabs.map(tab => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                <Icon />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-        
-        <div className="tab-content">
-          <InventoryTables
-            type={activeTab}
-            data={data}
-            onFetchData={fetchChildData}
-          />
-        </div>
+        <InventoryFlow 
+          data={data}
+          onFetchData={fetchChildData}
+        />
       </div>
     </>
   );
 }
 
-export default InventoryPage;
-
+export default InventoryFlowPage;

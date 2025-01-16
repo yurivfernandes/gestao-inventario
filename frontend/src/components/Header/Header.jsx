@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaUserCog, FaDatabase, FaChartBar, FaSignOutAlt, FaKey } from 'react-icons/fa';
+import { FaUserCog, FaDatabase, FaChartBar, FaSignOutAlt, FaKey, FaThLarge } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/logo.svg';
 import './../../styles//Header.css';
@@ -17,7 +17,14 @@ function Header() {
         { to: "/perfil/senha", icon: <FaKey />, text: "Alterar Senha" }
       ]
     },
-    { to: "/inventario", icon: <FaDatabase />, text: "Inventário" },
+    { 
+      icon: <FaDatabase />, 
+      text: "Inventário",
+      submenu: [
+        { to: "/inventario", icon: <FaDatabase />, text: "Acessar Inventário" },
+        { to: "/inventario/flow", icon: <FaThLarge />, text: "Fluxo de Inventário" } // Adicionar a nova opção
+      ]
+    },
     { to: "/incidentes", icon: <FaChartBar />, text: "Gestão de Incidentes" },
   ];
 
