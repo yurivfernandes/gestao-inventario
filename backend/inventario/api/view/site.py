@@ -12,10 +12,19 @@ class SiteListCreate(APIView):
     def get(self, request):
         try:
             cliente_id = request.query_params.get("cliente")
-            if cliente_id:
-                sites = Site.objects.filter(cliente_id=cliente_id)
-            else:
-                sites = Site.objects.all()
+            if not cliente_id:
+                return Response(
+                    {"error": "Cliente é obrigatório"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            sites = Site.objects.filter(cliente_id=cliente_id)
+            search = request.query_params.get("search")
+            if search:
+                sites = sites.filter(
+                    Q(codigo_vivo__icontains=search)
+                    | Q(tipo_negocio__icontains=search)
+                )
 
             paginator = Paginator(sites, 50)  # 50 registros por página
             page_number = request.query_params.get("page")

@@ -197,9 +197,27 @@ const ItemCard = ({ item, type, selected, onSelect }) => {
   );
 };
 
+const Pagination = ({ currentPage, totalPages, onPageChange }) => (
+  <div className="pagination-controls">
+    <button 
+      onClick={() => onPageChange(currentPage - 1)}
+      disabled={currentPage <= 1}
+    >
+      Anterior
+    </button>
+    <span>{currentPage} de {totalPages}</span>
+    <button 
+      onClick={() => onPageChange(currentPage + 1)}
+      disabled={currentPage >= totalPages}
+    >
+      Próximo
+    </button>
+  </div>
+);
+
 const FlowSection = ({ 
   title, 
-  items = [],
+  data = { results: [], currentPage: 1, numPages: 1 },
   icon: Icon, 
   onSelect, 
   onSearch,
@@ -208,7 +226,8 @@ const FlowSection = ({
   type,
   showInactive,
   onToggleInactive,
-  onClear
+  onClear,
+  onPageChange
 }) => (
   <div className="flow-section">
     <div className="flow-header">
@@ -228,7 +247,7 @@ const FlowSection = ({
       </div>
     </div>
     <div className="flow-items">
-      {Array.isArray(items) && items
+      {Array.isArray(data.results) && data.results
         .filter(item => showInactive || item.status)
         .map(item => (
           <ItemCard 
@@ -240,6 +259,13 @@ const FlowSection = ({
           />
         ))}
     </div>
+    {data.numPages > 1 && (
+      <Pagination
+        currentPage={data.currentPage}
+        totalPages={data.numPages}
+        onPageChange={onPageChange}
+      />
+    )}
   </div>
 );
 
@@ -257,71 +283,159 @@ function InventoryFlow({ data, onFetchData }) {
     if (!item || !item.id) return;
 
     try {
-      // Limpa as seleções subsequentes dependendo do tipo
-      setSelected(prev => {
-        const newSelected = { ...prev };
-        
-        switch(type) {
-          case 'client':
-            // Se mudou o cliente, limpa site, equipamento e serviço
-            delete newSelected.site;
-            delete newSelected.equipment;
-            delete newSelected.service;
-            break;
-          case 'site':
-            // Se mudou o site, limpa equipamento e serviço
-            delete newSelected.equipment;
-            delete newSelected.service;
-            break;
-          case 'equipment':
-            // Se mudou o equipamento, limpa só o serviço
-            delete newSelected.service;
-            break;
-        }
-
-        // Atualiza a seleção atual
-        newSelected[type] = item.id;
-        return newSelected;
-      });
-
-      // Atualiza os dados relacionados
-      const fetchMap = {
-        client: ['sites', 'equipments', 'services'],
-        site: ['equipments', 'services'],
-        equipment: ['services']
-      };
-
-      const typesToFetch = fetchMap[type] || [];
-      for (const nextType of typesToFetch) {
-        await onFetchData(nextType, item.id);
+      // Primeiro, preparamos o novo estado baseado no tipo selecionado
+      let newState;
+      switch(type) {
+        case 'client':
+          newState = { client: item.id };
+          break;
+        case 'site':
+          newState = { 
+            ...selected,
+            site: item.id,
+            equipment: undefined,
+            service: undefined 
+          };
+          break;
+        case 'equipment':
+          newState = { 
+            ...selected,
+            equipment: item.id,
+            service: undefined 
+          };
+          break;
+        case 'service':
+          newState = { ...selected, service: item.id };
+          break;
+        default:
+          newState = selected;
       }
 
+      // Atualizamos o estado
+      setSelected(newState);
+
+      // Agora fazemos as chamadas API com o estado atualizado
+      switch(type) {
+        case 'client':
+          await Promise.all([
+            onFetchData('sites', item.id, 1),
+            onFetchData('equipments', item.id, 1),
+            onFetchData('services', item.id, 1)
+          ]);
+          break;
+        
+        case 'site':
+          await Promise.all([
+            onFetchData('equipments', newState.client, 1, { 
+              site: item.id 
+            }),
+            onFetchData('services', newState.client, 1, { 
+              site: item.id 
+            })
+          ]);
+          break;
+        
+        case 'equipment':
+          // Aqui está a correção principal
+          await onFetchData('services', newState.client, 1, { 
+            site: newState.site,
+            equipamento: item.id 
+          });
+          break;
+      }
     } catch (error) {
       console.error('Erro ao selecionar item:', error);
+    }
+  };
+
+  const handleSearch = async (type, term) => {
+    setSearches(prev => ({ ...prev, [type]: term }));
+    
+    try {
+      const params = {
+        search: term,
+        ...(selected.site && { site: selected.site }),
+        ...(selected.equipment && { equipamento: selected.equipment })
+      };
+
+      switch(type) {
+        case 'clients':
+          await onFetchData('clients', null, 1, { search: term });
+          break;
+        case 'sites':
+          await onFetchData('sites', selected.client, 1, { search: term });
+          break;
+        case 'equipments':
+          await onFetchData('equipments', selected.client, 1, { 
+            ...params,
+            site: selected.site 
+          });
+          break;
+        case 'services':
+          await onFetchData('services', selected.client, 1, params);
+          break;
+      }
+    } catch (error) {
+      console.error('Erro ao realizar busca:', error);
+    }
+  };
+
+  const handlePageChange = async (type, page) => {
+    try {
+      const searchTerm = searches[type];
+      const params = {
+        ...(searchTerm && { search: searchTerm }),
+        ...(selected.site && { site: selected.site }),
+        ...(selected.equipment && { equipamento: selected.equipment })
+      };
+
+      switch(type) {
+        case 'clients':
+          await onFetchData('clients', null, page, params);
+          break;
+        case 'sites':
+          await onFetchData('sites', selected.client, page, params);
+          break;
+        case 'equipments':
+          await onFetchData('equipments', selected.client, page, params);
+          break;
+        case 'services':
+          await onFetchData('services', selected.client, page, params);
+          break;
+      }
+    } catch (error) {
+      console.error('Erro ao mudar página:', error);
     }
   };
 
   // Função para limpar seleções específicas
   const clearSelection = (type) => {
     setSelected(prev => {
-      const newSelected = { ...prev };
       switch(type) {
         case 'client':
           return {};
         case 'site':
-          delete newSelected.site;
-          delete newSelected.equipment;
-          delete newSelected.service;
-          return newSelected;
+          // Ao limpar site, recarrega equipamentos e serviços sem filtro de site
+          onFetchData('equipments', prev.client, 1);
+          onFetchData('services', prev.client, 1);
+          return { client: prev.client };
         case 'equipment':
-          delete newSelected.equipment;
-          delete newSelected.service;
-          return newSelected;
+          // Ao limpar equipamento, recarrega serviços com filtro apenas de site
+          onFetchData('services', prev.client, 1, { 
+            site: prev.site 
+          });
+          return { 
+            client: prev.client, 
+            site: prev.site 
+          };
         case 'service':
-          delete newSelected.service;
-          return newSelected;
+          return { 
+            client: prev.client,
+            site: prev.site,
+            equipment: prev.equipment
+          };
         default:
-          return newSelected;
+          return prev;
       }
     });
   };
@@ -365,70 +479,67 @@ function InventoryFlow({ data, onFetchData }) {
     <div className="inventory-flow">
       <FlowSection
         title="Clientes"
-        items={filterItems(data.clients, searches.clients)}
+        data={data.clients}
         icon={FaBuilding}
         onSelect={(item) => handleSelect('client', item)}
-        onSearch={(term) => setSearches(prev => ({ ...prev, clients: term }))}
+        onSearch={(term) => handleSearch('clients', term)}
         selected={selected.client}
         searchTerm={searches.clients}
         type="client"
         showInactive={showInactive.clients}
         onToggleInactive={(checked) => setShowInactive(prev => ({ ...prev, clients: checked }))}
         onClear={() => clearSelection('client')}
+        onPageChange={(page) => handlePageChange('clients', page)}
       />
 
       {selected.client && (
         <FlowSection
           title="Sites"
-          items={filterItems(data.sites[selected.client] || [], searches.sites)}
+          data={data.sites[selected.client] || { results: [], currentPage: 1, numPages: 1 }}
           icon={FaServer}
           onSelect={(item) => handleSelect('site', item)}
-          onSearch={(term) => setSearches(prev => ({ ...prev, sites: term }))}
+          onSearch={(term) => handleSearch('sites', term)}
           selected={selected.site}
           searchTerm={searches.sites}
           type="site"
           showInactive={showInactive.sites}
           onToggleInactive={(checked) => setShowInactive(prev => ({ ...prev, sites: checked }))}
           onClear={() => clearSelection('site')}
+          onPageChange={(page) => handlePageChange('sites', page)}
         />
       )}
 
       {selected.client && (
         <FlowSection
           title="Equipamentos"
-          items={filterEquipmentsBySite(
-            filterItems(data.equipments[selected.client] || [], searches.equipments),
-            selected.site
-          )}
+          data={data.equipments[selected.client] || { results: [], currentPage: 1, numPages: 1 }}
           icon={FaServer} // Alterado de FaCogs para FaServer
           onSelect={(item) => handleSelect('equipment', item)}
-          onSearch={(term) => setSearches(prev => ({ ...prev, equipments: term }))}
+          onSearch={(term) => handleSearch('equipments', term)}
           selected={selected.equipment}
           searchTerm={searches.equipments}
           type="equipment"
           showInactive={showInactive.equipments}
           onToggleInactive={(checked) => setShowInactive(prev => ({ ...prev, equipments: checked }))}
           onClear={() => clearSelection('equipment')}
+          onPageChange={(page) => handlePageChange('equipments', page)}
         />
       )}
 
       {selected.client && (
         <FlowSection
           title="Serviços"
-          items={filterServicesBySiteAndEquipment(
-            filterItems(data.services[selected.client] || [], searches.services),
-            selected.site,
-            selected.equipment
-          )}
+          data={data.services[selected.client] || { results: [], currentPage: 1, numPages: 1 }}
           icon={FaCogs}
           onSelect={(item) => handleSelect('service', item)}
-          onSearch={(term) => setSearches(prev => ({ ...prev, services: term }))}
+          onSearch={(term) => handleSearch('services', term)}
           selected={selected.service}
           searchTerm={searches.services}
           type="service"
           showInactive={showInactive.services}
           onToggleInactive={(checked) => setShowInactive(prev => ({ ...prev, services: checked }))}
           onClear={() => clearSelection('service')}
+          onPageChange={(page) => handlePageChange('services', page)}
         />
       )}
     </div>
