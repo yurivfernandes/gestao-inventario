@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -12,8 +13,19 @@ class ClienteListCreate(APIView):
 
     def get(self, request):
         clientes = Cliente.objects.all()
-        serializer = ClienteSerializer(clientes, many=True)
-        return Response(serializer.data)
+        paginator = Paginator(clientes, 50)  # 50 registros por página
+        page_number = request.query_params.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        serializer = ClienteSerializer(page_obj, many=True)
+        return Response(
+            {
+                "count": paginator.count,
+                "num_pages": paginator.num_pages,
+                "current_page": page_obj.number,
+                "results": serializer.data,
+            }
+        )
 
     def post(self, request):
         serializer = ClienteSerializer(data=request.data)

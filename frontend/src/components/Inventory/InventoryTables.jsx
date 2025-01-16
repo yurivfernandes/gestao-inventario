@@ -42,17 +42,20 @@ const tableConfigs = {
   },
   equipments: {
     columns: [
-      { key: 'designador', label: 'Designador' },
-      { key: 'codigo', label: 'Código' },
+      { key: 'site_codigo_vivo', label: 'Código Site Vivo' }, 
+      { key: 'codigo', label: 'Código Equipamento' },
       { key: 'tipo', label: 'Tipo' },
+      { key: 'designador', label: 'Designador' },
       { key: 'status', label: 'Status', render: (val) => val ? 'Ativo' : 'Inativo' }
     ]
   },
   services: {
     columns: [
-      { key: 'designador', label: 'Designador' },
-      { key: 'codigo', label: 'Código' },
+      { key: 'site_codigo_vivo', label: 'Código Site Vivo' },
+      { key: 'equipamento_codigo', label: 'Código Equipamento' },
+      { key: 'codigo', label: 'Código Serviço' },
       { key: 'tipo', label: 'Tipo' },
+      { key: 'designador', label: 'Designador' },
       { key: 'status', label: 'Status', render: (val) => val ? 'Ativo' : 'Inativo' }
     ]
   }
@@ -73,7 +76,11 @@ const getFilterConfig = (type, data) => {
       }
     ],
     sites: [
-      { key: 'cliente', label: 'Cliente', type: 'combobox',
+      { 
+        key: 'cliente', 
+        label: 'Cliente (Obrigatório)', 
+        type: 'combobox',
+        required: true,
         options: data.clients.map(c => ({
           value: c.id,
           label: `${c.razao_social} (${c.codigo})`
@@ -93,7 +100,7 @@ const getFilterConfig = (type, data) => {
     equipments: [
       { 
         key: 'cliente', 
-        label: 'Cliente', 
+        label: 'Cliente (Obrigatório)', 
         type: 'combobox',
         required: true,
         options: data.clients.map(c => ({
@@ -129,7 +136,7 @@ const getFilterConfig = (type, data) => {
     services: [
       { 
         key: 'cliente', 
-        label: 'Cliente', 
+        label: 'Cliente (Obrigatório)', 
         type: 'combobox',
         required: true,
         options: data.clients.map(c => ({
@@ -138,32 +145,14 @@ const getFilterConfig = (type, data) => {
         }))
       },
       { 
-        key: 'site', 
-        label: 'Site', 
-        type: 'combobox',
-        options: filters => {
-          if (!filters.cliente) return [];
-          return (data.sites[filters.cliente] || []).map(s => ({
-            value: s.id,
-            label: `${s.codigo_vivo} (${s.tipo_site})`
-          }));
-        }
+        key: 'site_codigo_vivo', 
+        label: 'Código do Site', 
+        type: 'text'
       },
       { 
-        key: 'equipment', 
-        label: 'Equipamento', 
-        type: 'combobox',
-        options: filters => {
-          if (!filters.cliente) return [];
-          let equipments = data.equipments[filters.cliente] || [];
-          if (filters.site) {
-            equipments = equipments.filter(e => e.site === filters.site);
-          }
-          return equipments.map(e => ({
-            value: e.id,
-            label: `${e.designador} (${e.tipo})`
-          }));
-        }
+        key: 'equipamento_codigo_vivo', 
+        label: 'Código do Equipamento', 
+        type: 'text'
       },
       { key: 'designador', label: 'Designador', type: 'text' },
       { key: 'codigo', label: 'Código', type: 'text' },
@@ -308,91 +297,32 @@ const FiltersSection = ({ type, filters, setFilters, data }) => {
   );
 };
 
-function InventoryTables({ type, data, onEdit }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showInactive, setShowInactive] = useState(false);
+function InventoryTables({ type, data, onEdit, onFetchData }) {
   const [filters, setFilters] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   useEffect(() => {
-    // Limpa os filtros quando muda o tipo da tabela
     setFilters({});
     setCurrentPage(1);
   }, [type]);
 
-  const config = tableConfigs[type];
-  const items = type === 'clients' ? data.clients : 
-                Object.values(data[type] || {}).flat();
-
-  const getFilteredData = () => {
-    let items = [];
-    
-    switch(type) {
-      case 'clients':
-        items = data.clients || [];
-        break;
-      case 'sites':
-        items = filters.cliente ? 
-          data.sites[filters.cliente] || [] :
-          Object.values(data.sites || {}).flat();
-        break;
-      case 'equipments':
-        if (!filters.cliente) return [];
-        items = Object.values(data.equipments || {})
-          .flat()
-          .filter(e => {
-            if (filters.site) {
-              return e.site === filters.site;
-            }
-            return true;
-          });
-        break;
-      case 'services':
-        if (!filters.cliente) return [];
-        items = Object.values(data.services || {})
-          .flat()
-          .filter(s => {
-            if (filters.site && data.equipments) {
-              const siteEquipments = Object.values(data.equipments)
-                .flat()
-                .filter(e => e.site === filters.site)
-                .map(e => e.id);
-              return siteEquipments.includes(s.equipamento);
-            }
-            if (filters.equipment) {
-              return s.equipamento === filters.equipment;
-            }
-            return true;
-          });
-        break;
-      default:
-        return [];
+  useEffect(() => {
+    // Chama a API quando mudar a página ou quando selecionar um cliente
+    if (type === 'clients') {
+      onFetchData('clients', null, currentPage);
+    } else if (filters.cliente) {
+      onFetchData(type, filters.cliente, currentPage);
     }
+  }, [type, filters.cliente, currentPage]);
 
-    // Aplica os demais filtros
-    return items.filter(item => {
-      return Object.entries(filters)
-        .filter(([key]) => !['cliente', 'site', 'equipment'].includes(key))
-        .every(([key, value]) => {
-          if (!value) return true;
-          if (key === 'status') return String(item[key]) === value;
-          return String(item[key] || '').toLowerCase().includes(value.toLowerCase());
-        });
-    });
-  };
+  const items = type === 'clients' ? 
+    data.clients : 
+    (filters.cliente && data[type][filters.cliente] ? data[type][filters.cliente] : []);
 
-  const paginatedData = () => {
-    const filtered = getFilteredData();
-    const start = (currentPage - 1) * itemsPerPage;
-    return {
-      items: filtered.slice(start, start + itemsPerPage),
-      total: filtered.length
-    };
-  };
-
-  const { items: filteredItems, total } = paginatedData();
-  const totalPages = Math.ceil(total / itemsPerPage);
+  // Pega o total de páginas do estado
+  const totalPages = type === 'clients' ? 
+    data.clientsTotalPages : 
+    (filters.cliente && data[`${type}TotalPages`] ? data[`${type}TotalPages`] : 1);
 
   return (
     <div className="inventory-table-container">
@@ -407,7 +337,7 @@ function InventoryTables({ type, data, onEdit }) {
         <table className="inventory-table">
           <TableHeader columns={[...tableConfigs[type].columns, { key: 'actions', label: '' }]} />
           <tbody>
-            {filteredItems.map((item, index) => (
+            {items && items.map((item, index) => (
               <tr key={item.id || index}>
                 {tableConfigs[type].columns.map((col, colIndex) => (
                   <td key={colIndex}>
@@ -425,23 +355,25 @@ function InventoryTables({ type, data, onEdit }) {
         </table>
       </div>
 
-      <div className="pagination">
-        <button 
-          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-        >
-          Anterior
-        </button>
-        <span>
-          Página {currentPage} de {totalPages}
-        </span>
-        <button 
-          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-          disabled={currentPage === totalPages}
-        >
-          Próximo
-        </button>
-      </div>
+      {items && items.length > 0 && (
+        <div className="pagination">
+          <button 
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+          <span>
+            Página {currentPage} de {totalPages}
+          </span>
+          <button 
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Próximo
+          </button>
+        </div>
+      )}
     </div>
   );
 }

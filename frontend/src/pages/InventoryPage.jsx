@@ -22,13 +22,13 @@ function InventoryPage() {
     fetchClients();
   }, []);
 
-  const fetchClients = async () => {
+  const fetchClients = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await api.get('/inventario/clientes/', {
+      const response = await api.get(`/inventario/clientes/?page=${page}`, {
         headers: { Authorization: `Token ${token}` }
       });
-      setData(prev => ({ ...prev, clients: response.data }));
+      setData(prev => ({ ...prev, clients: response.data.results, clientsTotalPages: response.data.num_pages }));
     } catch (err) {
       setError('Erro ao carregar dados');
     } finally {
@@ -36,28 +36,41 @@ function InventoryPage() {
     }
   };
 
-  const fetchChildData = async (type, parentId) => {
-    if (!parentId) return;
+  const fetchChildData = async (type, parentId, page = 1) => {
+    if (type !== 'clients' && !parentId) {
+      setError('Selecione um cliente primeiro');
+      return;
+    }
 
     try {
       const endpoints = {
+        clients: '/inventario/clientes/',
         sites: `/inventario/sites/?cliente=${parentId}`,
         equipments: `/inventario/equipamentos/?cliente=${parentId}`,
         services: `/inventario/servicos/?cliente=${parentId}`
       };
 
-      const response = await api.get(endpoints[type], {
+      const response = await api.get(`${endpoints[type]}&page=${page}`, {
         headers: { Authorization: `Token ${token}` }
       });
       
       if (response.data) {
-        setData(prev => ({
-          ...prev,
-          [type]: { 
-            ...prev[type], 
-            [parentId]: Array.isArray(response.data) ? response.data : []
-          }
-        }));
+        if (type === 'clients') {
+          setData(prev => ({
+            ...prev,
+            clients: response.data.results,
+            clientsTotalPages: response.data.num_pages
+          }));
+        } else {
+          setData(prev => ({
+            ...prev,
+            [type]: {
+              ...prev[type],
+              [parentId]: response.data.results
+            },
+            [`${type}TotalPages`]: response.data.num_pages
+          }));
+        }
       }
     } catch (err) {
       console.error(`Erro ao carregar ${type}:`, err);
@@ -98,8 +111,7 @@ function InventoryPage() {
           <InventoryTables
             type={activeTab}
             data={data}
-            onFetchData={fetchChildData}
-          />
+            onFetchData={fetchChildData}          />
         </div>
       </div>
     </>
