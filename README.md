@@ -8,17 +8,20 @@ Sistema desenvolvido para gerenciar o inventário completo da Vivo Vita, permiti
 - Cadastro e gerenciamento de usuários
 - Sistema de autenticação
 - Alteração de senha
-
-### Em Desenvolvimento
+- Tela de perfil/alteração de senha
+- Welcome page
+- Tela de inventário
 - Gestão de inventário
   - Cadastro de clientes
   - Cadastro de sites
   - Cadastro de equipamentos
   - Cadastro de serviços
+
+### Em Desenvolvimento
 - Gestão de incidentes
-  - Registro de ocorrências
   - Análise de indisponibilidades
   - Correlação de eventos
+  - Tela de gestão de incidentes
 
 ## Tecnologias Utilizadas
 
