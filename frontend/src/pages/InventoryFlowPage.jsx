@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import Header from '../components/Header/Header';
 import InventoryFlow from '../components/Inventory/InventoryFlow';
-import '../styles/InventoryPage.css';
+import '../styles/InventoryFlow.css';
 
 function InventoryFlowPage() {
   const { token } = useAuth();

@@ -57,7 +57,7 @@
 }
 
 .welcome-header h1 {
-  background: linear-gradient(45deg, #6B46C1, #D8337D);
+  background: linear-gradient(90deg, #670099, #C92C82);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 2.5rem;
@@ -66,24 +66,24 @@
 }
 
 .welcome-subtitle {
-  color: #8f9bba;
+  color: #828181;
   font-size: 1.3rem;
   letter-spacing: 1px;
 }
 
 .welcome-cards-grid {  /* Renomeada de cards-grid para welcome-cards-grid */
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
   padding: 1rem;
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 
 .welcome-container .welcome-card {
-  background: linear-gradient(135deg, #6B46C1, #D8337D);
+  background: linear-gradient(40deg, #670099, #C92C82);
   border-radius: 12px;
   padding: 2rem;
   transition: all 0.3s ease;
@@ -204,83 +204,3 @@
   transform: scale(1.05);
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(3);
-    opacity: 0;
-  }
-}
-
-@media (max-width: 1800px) {
-  .welcome-cards-grid {
-    grid-template-columns: repeat(4, minmax(200px, 1fr));
-  }
-}
-
-@media (max-width: 1600px) {
-  .welcome-cards-grid {
-    grid-template-columns: repeat(3, minmax(250px, 1fr));
-  }
-}
-
-@media (max-width: 1400px) {
-  .welcome-cards-grid {
-    grid-template-columns: repeat(3, minmax(200px, 1fr));
-  }
-}
-
-@media (max-width: 1200px) {
-  .welcome-cards-grid {
-    grid-template-columns: repeat(2, minmax(250px, 1fr));
-  }
-}
-
-@media (max-width: 1100px) {
-  .welcome-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 1024px) {
-  .welcome-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .welcome-header h1 {
-    font-size: 2rem;
-  }
-  
-  .welcome-container .welcome-cards-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .welcome-container .welcome-card {
-    padding: 1.5rem;
-  }
-  
-  .welcome-card-icon {
-    margin-bottom: 1rem;
-  }
-
-  .sub-items {
-    flex-direction: column;
-  }
-  
-  .sub-items li {
-    width: 100%;
-  }
-}
-
-.gradient-text {
-  background: linear-gradient(45deg, #6B46C1, #D8337D);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: bold;
-}

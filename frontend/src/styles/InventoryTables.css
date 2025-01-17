@@ -92,12 +92,12 @@
 
 .filter-field label {
   position: absolute;
-  top: -0.75rem;
-  left: 1rem;
+  top: -0.65rem;
+  left: 0.4rem;
   padding: 0 0.5rem;
   background: #f8fafc;
   font-size: 0.75rem;
-  color: #6B46C1;
+  color: #670099;
   font-weight: 500;
   z-index: 1;
 }
@@ -117,7 +117,7 @@
 .filter-field input:focus,
 .filter-field select:focus {
   outline: none;
-  border-color: #6B46C1;
+  border-color: #670099;
   box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.1);
 }
 
@@ -155,9 +155,29 @@
 .filter-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 0.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid #e2e8f0;
   margin-top: 1.5rem;
+}
+
+.search-button {
+  padding: 0.5rem 1rem;
+  background: #670099;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  height: 36px;
+}
+
+.search-button:hover {
+  background: #670099;
 }
 
 .table-wrapper {
@@ -170,67 +190,120 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+  font-size: 0.875rem;
 }
 
 .inventory-table th {
-  background: #f8fafc;
-  padding: 1rem;
-  font-weight: 600;
-  color: #1e293b;
+  background: #670099;
+  padding: 1rem 1.25rem;
+  font-weight: 500;
+  color: white;
   text-align: left;
-  border-bottom: 2px solid #e2e8f0;
   white-space: nowrap;
+  transition: background-color 0.2s;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
 }
 
-.inventory-table td {
-  padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  color: #334155;
+.inventory-table th:first-child {
+  border-top-left-radius: 8px;
 }
 
-.inventory-table tr:hover {
-  background: #f8fafc;
-}
-
-.actions-column {
-  width: 50px;
+.inventory-table th:last-child {
+  border-top-right-radius: 8px;
   text-align: center;
 }
 
-.edit-button {
-  padding: 0.5rem;
-  border: none;
-  background: transparent;
-  color: #6B46C1;
-  cursor: pointer;
+.inventory-table td {
+  padding: 1rem 1.25rem;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
   transition: all 0.2s;
 }
 
-.edit-button:hover {
-  color: #D8337D;
-  transform: scale(1.1);
+.inventory-table tbody tr {
+  transition: all 0.2s;
 }
 
+.inventory-table tbody tr:hover {
+  background-color: #faf5ff;
+}
+
+.inventory-table tbody tr:hover td {
+  color: #670099;
+}
+
+/* Status column styling */
+.inventory-table td[data-status="true"],
+.inventory-table td[data-status="false"] {
+  font-weight: 500;
+}
+
+.inventory-table td[data-status="true"] {
+  color: #059669;
+}
+
+.inventory-table td[data-status="false"] {
+  color: #DC2626;
+}
+
+/* Empty state */
+.inventory-table-empty {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+/* Loading state */
+.inventory-table-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+}
+
+/* Pagination */
 .pagination {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
   margin-top: 1.5rem;
+  padding: 1rem 0;
+}
+
+.pagination-info {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .pagination button {
   padding: 0.5rem 1rem;
   border: 1px solid #e2e8f0;
   background: white;
+  color: #64748b;
   border-radius: 6px;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .pagination button:hover:not(:disabled) {
-  background: #f8fafc;
-  border-color: #6B46C1;
+  border-color: #670099;
+  color: #670099;
+  background: #faf5ff;
 }
 
 .pagination button:disabled {
@@ -238,21 +311,56 @@
   cursor: not-allowed;
 }
 
+.pagination span {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.actions-column {
+  width: 50px;
+  text-align: center;
+  padding: 0.5rem !important;
+}
+
+.edit-button {
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  color: #670099;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  margin: 0 auto;
+}
+
+.edit-button:hover {
+  background: rgba(103, 0, 153, 0.1);
+  color: #670099;
+  transform: scale(1.1);
+}
+
 .clear-filters {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem;
   border: 1px solid #e2e8f0;
   background: white;
   color: #64748b;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 1.1rem; /* Aumentado um pouco para o novo ícone */
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
   transition: all 0.2s;
-  margin-left: auto;
+  width: 36px;
+  height: 36px;
 }
 
 .clear-filters:hover {
   background: #f1f5f9;
   color: #D8337D;
+  border-color: #D8337D;
 }
