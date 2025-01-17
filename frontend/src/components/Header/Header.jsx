@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUserCog, FaDatabase, FaChartBar, FaSignOutAlt, FaKey, FaThLarge, FaUser } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
@@ -8,6 +8,7 @@ import './../../styles//Header.css';
 function Header() {
   const { logout, userData } = useAuth();
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const menuItems = [
     { 
@@ -28,6 +29,10 @@ function Header() {
     { to: "/incidentes", icon: <FaChartBar />, text: "Gestão de Incidentes" },
   ];
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <header className="app-header">
       <div className="app-header-content">
@@ -35,7 +40,13 @@ function Header() {
           <img src={logo} alt="Logo" />
         </Link>
 
-        <nav className="app-nav">
+        <div className="hamburger" onClick={toggleMenu}>
+          <span className={`bar ${isMenuOpen ? 'active' : ''}`}></span>
+          <span className={`bar ${isMenuOpen ? 'active' : ''}`}></span>
+          <span className={`bar ${isMenuOpen ? 'active' : ''}`}></span>
+        </div>
+
+        <nav className={`app-nav ${isMenuOpen ? 'active' : ''}`}>
           <ul className="app-menu">
             {menuItems.map((item, index) => (
               <li key={index} className={item.submenu ? 'app-menu-item has-submenu' : 'app-menu-item'}>
