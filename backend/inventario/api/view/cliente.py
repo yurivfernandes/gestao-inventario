@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -12,9 +13,32 @@ class ClienteListCreate(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # Obtém os parâmetros de filtro da URL
+        razao_social = request.query_params.get("razao_social")
+        cnpj = request.query_params.get("cnpj")
+        vantive_id = request.query_params.get("vantive_id")
+        codigo = request.query_params.get("codigo")
+        status = request.query_params.get("status")
+
+        # Inicia com todos os clientes
         clientes = Cliente.objects.all()
-        paginator = Paginator(clientes, 50)  # 50 registros por página
-        page_number = request.query_params.get("page")
+
+        # Aplica os filtros se fornecidos
+        if razao_social:
+            clientes = clientes.filter(razao_social__icontains=razao_social)
+        if cnpj:
+            clientes = clientes.filter(cnpj__icontains=cnpj)
+        if codigo:
+            clientes = clientes.filter(codigo__icontains=codigo)
+        if vantive_id:
+            clientes = clientes.filter(vantive_id=vantive_id)
+        if (
+            status is not None
+        ):  # Precisa checar None porque status pode ser False
+            clientes = clientes.filter(status=status.lower() == "true")
+
+        paginator = Paginator(clientes, 50)
+        page_number = request.query_params.get("page", 1)
         page_obj = paginator.get_page(page_number)
 
         serializer = ClienteSerializer(page_obj, many=True)

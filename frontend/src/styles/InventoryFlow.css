@@ -4,9 +4,8 @@
   grid-template-rows: repeat(2, 1fr);
   gap: 1rem;
   height: calc(100vh - 150px);
-  padding: 0.75rem;
   width: 100%;
-  margin: 0;
+  margin-top: 70px;
   overflow-y: auto;
 }
 
@@ -18,7 +17,7 @@
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
-  min-height: 400px;
+  min-height: 525px;
 }
 
 .flow-section.expanded {
@@ -39,17 +38,11 @@
 
 .flow-header h3 {
   font-size: 1.25rem;
-  color: #2d3748;
+  color: #670099;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   flex: 1;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
 .header-right {
@@ -65,7 +58,7 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   width: 180px;
-  height: 28px;
+  height: 20px;
   font-size: 0.85rem;
 }
 
@@ -93,33 +86,22 @@
   cursor: pointer;
   position: relative;
   text-align: left;
-  height: 140px;
-  max-height: 140px;
-  min-height: 140px;
+  height: 120px;
   overflow: hidden;
 }
 
 .flow-item.active {
-  border-left: 4px solid #6B46C1;
+  border-left: 4px solid #670099;
 }
 
 .flow-item.inactive {
   border-left: 4px solid #D8337D;
 }
 
-.flow-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
 
 .flow-item.selected {
   background: #f8f9ff;
-  border-color: #6B46C1;
-}
-
-.item-name {
-  font-weight: 500;
-  color: #2d3748;
+  border-color: #670099;
 }
 
 .item-status {
@@ -135,13 +117,13 @@
 }
 
 .item-status.active {
-  background: #e6fffa;
-  color: #2c7a7b;
+  background: #670099;
+  color: #e6daec;
 }
 
 .item-status.inactive {
-  background: #fed7d7;
-  color: #9b2c2c;
+  background: #C92C82;
+  color: #e6d5df;
 }
 
 /* Responsividade */
@@ -239,11 +221,11 @@
   height: 40px;
   background: #f8f9fa;
   border-radius: 8px;
-  color: #6B46C1;
+  color: #670099;
 }
 
 .icon-container.active {
-  color: #6B46C1;
+  color: #670099;
 }
 
 .icon-container.inactive {
@@ -265,7 +247,7 @@
 }
 
 .header-content h4.inactive {
-  color: #D8337D;
+  color: #C92C82;
 }
 
 .subtitle {
@@ -283,17 +265,6 @@
   color: #666;
 }
 
-.card-header {
-  width: 100%;
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.card-details {
-  width: 100%;
-  margin-top: 1rem;
-}
 
 .pagination-controls {
   display: flex;

@@ -1,122 +1,153 @@
 import React, { useState, useEffect } from 'react';
+import { FaFilter } from 'react-icons/fa';
+import Header from '../components/Header/Header';
+import FilterDropdown from '../components/Inventory/FilterDropdown';
+import InventoryTable from '../components/Inventory/InventoryTable';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import Header from '../components/Header/Header';
-import InventoryTables from '../components/Inventory/InventoryTables';
 import '../styles/InventoryPage.css';
-import { FaUsers, FaBuilding, FaServer, FaCogs } from 'react-icons/fa';
+
+const tabs = [
+  { id: 'clients', label: 'Clientes' },
+  { id: 'sites', label: 'Sites' },
+  { id: 'equipments', label: 'Equipamentos' },
+  { id: 'services', label: 'Serviços' }
+];
 
 function InventoryPage() {
   const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [data, setData] = useState({
-    clients: [],
-    sites: {},
-    equipments: {},
-    services: {}
-  });
   const [activeTab, setActiveTab] = useState('clients');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filters, setFilters] = useState({});
+  const [tableData, setTableData] = useState({
+    clients: [],
+    sites: [],
+    equipments: [],
+    services: []
+  });
+  const [loading, setLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState({
+    clients: 1,
+    sites: 1,
+    equipments: 1,
+    services: 1
+  });
+  const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  const fetchClients = async (page = 1) => {
+  const fetchData = async (type, page = 1) => {
     try {
       setLoading(true);
-      const response = await api.get(`/inventario/clientes/?page=${page}`, {
-        headers: { Authorization: `Token ${token}` }
+      
+      const queryParams = new URLSearchParams({ page });
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) {
+          queryParams.append(key, value);
+        }
       });
-      setData(prev => ({ ...prev, clients: response.data.results, clientsTotalPages: response.data.num_pages }));
-    } catch (err) {
-      setError('Erro ao carregar dados');
+
+      const queryString = queryParams.toString();
+      let response;
+
+      switch (type) {
+        case 'clients':
+          response = await api.get(`/inventario/clientes/?${queryString}`);
+          setTableData(prev => ({ ...prev, clients: response.data.results }));
+          setTotalPages(prev => ({ ...prev, clients: response.data.num_pages }));
+          break;
+        case 'sites':
+          response = await api.get(`/inventario/sites/?${queryString}`);
+          setTableData(prev => ({ ...prev, sites: response.data.results }));
+          setTotalPages(prev => ({ ...prev, sites: response.data.num_pages }));
+          break;
+        case 'equipments':
+          response = await api.get(`/inventario/equipamentos/?${queryString}`);
+          setTableData(prev => ({ ...prev, equipments: response.data.results }));
+          setTotalPages(prev => ({ ...prev, equipments: response.data.num_pages }));
+          break;
+        case 'services':
+          response = await api.get(`/inventario/servicos/?${queryString}`);
+          setTableData(prev => ({ ...prev, services: response.data.results }));
+          setTotalPages(prev => ({ ...prev, services: response.data.num_pages }));
+          break;
+        default:
+          break;
+      }
+
+      setIsFilterOpen(false);
+    } catch (error) {
+      console.error('Erro ao aplicar filtros:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchChildData = async (type, parentId, page = 1) => {
-    if (type !== 'clients' && !parentId) {
-      setError('Selecione um cliente primeiro');
-      return;
-    }
+  useEffect(() => {
+    fetchData(activeTab, currentPage);
+  }, [filters, activeTab, currentPage]);
 
-    try {
-      const endpoints = {
-        clients: '/inventario/clientes/',
-        sites: `/inventario/sites/?cliente=${parentId}`,
-        equipments: `/inventario/equipamentos/?cliente=${parentId}`,
-        services: `/inventario/servicos/?cliente=${parentId}`
-      };
-
-      const response = await api.get(`${endpoints[type]}&page=${page}`, {
-        headers: { Authorization: `Token ${token}` }
-      });
-      
-      if (response.data) {
-        if (type === 'clients') {
-          setData(prev => ({
-            ...prev,
-            clients: response.data.results,
-            clientsTotalPages: response.data.num_pages
-          }));
-        } else {
-          setData(prev => ({
-            ...prev,
-            [type]: {
-              ...prev[type],
-              [parentId]: response.data.results
-            },
-            [`${type}TotalPages`]: response.data.num_pages
-          }));
-        }
-      }
-    } catch (err) {
-      console.error(`Erro ao carregar ${type}:`, err);
-    }
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    setCurrentPage(1); // Resetar a página ao mudar de aba
   };
 
-  const tabs = [
-    { id: 'clients', label: 'Clientes', icon: FaUsers },
-    { id: 'sites', label: 'Sites', icon: FaBuilding },
-    { id: 'equipments', label: 'Equipamentos', icon: FaServer },
-    { id: 'services', label: 'Serviços', icon: FaCogs }
-  ];
-
-  if (loading) return <div className="loading">Carregando...</div>;
-  if (error) return <div className="error">{error}</div>;
-
   return (
-    <>
+    <div className="inventory-page">
       <Header />
-      <div className="inventory-container">
-        <div className="inventory-tabs">
-          {tabs.map(tab => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                <Icon />
-                {tab.label}
-              </button>
-            );
-          })}
+      
+      <main className="inventory-content">
+        <div className="inventory-header">
+          <div className="tabs-container">
+            <div className="tabs">
+              {tabs.map(tab => (
+                <button
+                  key={tab.id}
+                  className={`tab ${activeTab === tab.id ? 'active' : ''}`}
+                  onClick={() => handleTabChange(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="filter-container">
+            <button 
+              className="filter-button"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+            >
+              <FaFilter /> Filtros
+              {Object.keys(filters).length > 0 && (
+                <span className="filter-badge">
+                  {Object.keys(filters).length}
+                </span>
+              )}
+            </button>
+            
+            {isFilterOpen && (
+              <FilterDropdown
+                isOpen={isFilterOpen}
+                filters={filters}
+                setFilters={setFilters}
+                onApply={() => fetchData(activeTab, 1)}
+                onClose={() => setIsFilterOpen(false)}
+              />
+            )}
+          </div>
         </div>
-        
-        <div className="tab-content">
-          <InventoryTables
+
+        <div className="table-container">
+          <InventoryTable 
             type={activeTab}
-            data={data}
-            onFetchData={fetchChildData}          />
+            data={tableData[activeTab]}
+            loading={loading}
+            onPageChange={(page) => setCurrentPage(page)}
+            totalPages={totalPages[activeTab]}
+            currentPage={currentPage}
+          />
         </div>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
 
 export default InventoryPage;
-
