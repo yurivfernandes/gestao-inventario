@@ -143,6 +143,7 @@ function InventoryPage() {
             onPageChange={(page) => setCurrentPage(page)}
             totalPages={totalPages[activeTab]}
             currentPage={currentPage}
+            fetchData={fetchData}
           />
         </div>
       </main>
