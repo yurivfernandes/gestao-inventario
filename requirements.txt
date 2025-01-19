@@ -33,3 +33,7 @@ python-dotenv==1.0.1
 
 # Biblioteca para validação de documentos brasileiros
 validate-docbr==1.10.0
+
+# Documentation
+mkdocs==1.4.3
+mkdocs-material==9.0.5
