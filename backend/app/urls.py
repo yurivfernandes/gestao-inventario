@@ -15,13 +15,28 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-from rest_framework.authtoken import views
+from django.views.generic import RedirectView
+from django.views.static import serve
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/access/", include("access.urls")),
     path("api/inventario/", include("inventario.api.urls")),
     path("api/incidentes/", include("incidentes.api.urls")),
-]
+    path(
+        "api/docs/<path:path>",
+        serve,
+        {
+            "document_root": settings.MKDOCS_BUILD_DIR,
+        },
+    ),
+    path(
+        "api/docs/",
+        serve,
+        {"document_root": settings.MKDOCS_BUILD_DIR, "path": "index.html"},
+    ),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
