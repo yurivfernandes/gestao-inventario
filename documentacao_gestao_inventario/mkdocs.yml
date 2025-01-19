@@ -1,0 +1,60 @@
+site_name: Gestão de Inventário
+site_description: Documentação do sistema de Gestão de Inventário
+site_author: TI
+
+nav:
+  - Home: index.md
+  - Manual do Usuário:
+      - Login e Senha: manual/login-senha.md
+      - Página Inicial: manual/welcome.md
+      - Inventário:
+          - Gestão de Inventário: manual/inventario/gestao.md
+          - Fluxo de Inventário: manual/inventario/fluxo.md
+      - Gestão de Incidentes: manual/incidentes.md
+  - Backend:
+      - Módulos:
+          - Access: backend/modulos/access.md
+          - App: backend/modulos/app.md
+          - Docs: backend/modulos/docs.md
+          - Incidentes: backend/modulos/incidentes.md
+          - Inventário: backend/modulos/inventario.md
+  - Frontend:
+      - Páginas:
+          - Login: frontend/paginas/login.md
+          - Welcome: frontend/paginas/welcome.md
+          - Inventário: frontend/paginas/inventario.md
+          - Incidentes: frontend/paginas/incidentes.md
+      - Componentes: frontend/componentes.md
+      - Estilos CSS: frontend/estilos.md
+
+theme:
+  name: material
+  logo: assets/images/logo.svg
+  favicon: assets/images/favicon.svg
+  palette:
+    - scheme: default
+      primary: custom
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  language: pt-BR
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+
+extra:
+  assets_dir: assets
+
+extra_css:
+  - stylesheets/extra.css
+extra_javascript: []
+extra_files:
+  - assets/images/logo.svg
+  - assets/images/favicon.svg
+
+site_dir: ../backend/docs
+use_directory_urls: false
