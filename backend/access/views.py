@@ -1,6 +1,6 @@
 import json
 
-from django.contrib.auth import authenticate, get_user_model, login
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, JsonResponse
@@ -11,7 +11,7 @@ from django.views.decorators.http import require_http_methods
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .forms import CustomUserCreationForm
@@ -35,22 +35,46 @@ def signup(request):
 
 
 @csrf_exempt
-@api_view(["POST"])
-@permission_classes([AllowAny])  # Permite acesso sem autenticação
+@require_http_methods(["OPTIONS", "POST"])
 def api_login(request):
-    data = request.data
-    username = data.get("username")
-    password = data.get("password")
+    if request.method == "OPTIONS":
+        response = HttpResponse()
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+        response["Access-Control-Allow-Headers"] = "Content-Type"
+        return response
 
-    user = authenticate(username=username, password=password)
-    if user:
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response(
-            {"token": token.key, "user_id": user.id, "username": user.username}
-        )
-    return Response(
-        {"error": "Credenciais inválidas"}, status=status.HTTP_400_BAD_REQUEST
-    )
+    if request.method == "POST":
+        data = json.loads(request.body)
+        username = data.get("username")
+        password = data.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            token, created = Token.objects.get_or_create(user=user)
+            response = JsonResponse(
+                {"message": "Login successful", "token": token.key}
+            )
+        else:
+            response = JsonResponse(
+                {"error": "Invalid credentials"}, status=400
+            )
+
+        response["Access-Control-Allow-Origin"] = "*"
+        return response
+
+    response = JsonResponse({"error": "Invalid request method"}, status=405)
+    response["Access-Control-Allow-Origin"] = "*"
+    return response
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_logout(request):
+    if request.method == "POST":
+        logout(request)
+        return JsonResponse({"message": "Logout successful"})
+    return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
 @api_view(["GET"])
@@ -102,7 +126,10 @@ def profile_view(request):
     user = request.user
     data = {
         "username": user.username,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
         "full_name": user.full_name,
+        "company_name": user.company_name,
     }
     return Response(data)
 
@@ -112,7 +139,7 @@ def profile_view(request):
 def profile_update(request):
     user = request.user
     try:
-        for field in ["full_name", "phone", "company_name", "cep"]:
+        for field in ["full_name"]:
             if field in request.data:
                 setattr(user, field, request.data[field])
         user.save()
@@ -121,16 +148,3 @@ def profile_update(request):
         return Response(
             {"message": str(e)}, status=status.HTTP_400_BAD_REQUEST
         )
-
-
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def get_user_data(request):
-    user = request.user
-    return Response(
-        {
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "username": user.username,
-        }
-    )

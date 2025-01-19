@@ -1,0 +1,384 @@
+.filter-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    width: 500px;
+    padding: 16px;
+    overflow: visible;
+  }
+  
+  .filter-dropdown-content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .filter-field {
+    position: relative;
+    min-height: 60px;
+  }
+  
+  .filter-field.client-search {
+    grid-column: 1 / -1;
+  }
+  
+  .filter-field label {
+    display: block;
+    font-size: 12px;
+    color: #4a5568;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  
+  .filter-field input {
+    width: 100%;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 32px;
+  }
+  
+  .filter-field input:focus {
+    outline: none;
+    border-color: #670099;
+    box-shadow: 0 0 0 2px rgba(103, 0, 153, 0.1);
+  }
+  
+  .search-input-container {
+    position: relative;
+  }
+  
+  .client-search {
+    grid-column: span 2;
+  }
+  
+  .client-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 0 4px 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 1px;
+  }
+  
+  .client-option {
+    padding: 8px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  
+  .client-option:hover {
+    background: #f8fafc;
+  }
+  
+  .filter-button {
+    position: relative;
+  }
+  
+  .filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+  }
+  
+  .apply-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #670099;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+    height: 32px;
+  }
+  
+  .apply-button:hover {
+    background: #4a006f;
+  }
+  
+  .inv-filter-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    width: 800px; /* Aumentado para acomodar mais campos */
+    padding: 16px;
+  }
+  
+  .inv-filter-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Alterado para 3 colunas */
+    gap: 16px;
+    padding: 0 4px;
+  }
+  
+  .inv-filter-field {
+    position: relative;
+    margin-bottom: 8px;
+    width: 100%;
+  }
+  
+  .inv-filter-field.client-search {
+    grid-column: 1 / -1;
+  }
+  
+  .inv-filter-label {
+    position: absolute;
+    top: -0.65rem;
+    left: 0.4rem;
+    padding: 0 0.5rem;
+    background: white;
+    font-size: 0.75rem;
+    color: #670099;
+    font-weight: 500;
+    z-index: 1;
+  }
+  
+  .inv-filter-input {
+    width: 100%;
+    height: 36px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: white;
+    box-sizing: border-box;
+    transition: all 0.2s;
+  }
+  
+  .inv-filter-input:focus {
+    outline: none;
+    border-color: #670099;
+    box-shadow: 0 0 0 2px rgba(103, 0, 153, 0.1);
+  }
+  
+  .inv-filter-input[type="select"] {
+    padding-right: 24px; /* Espaço para ícone de seta */
+    appearance: none;
+    background-image: url("data:image/svg+xml,..."); /* Adicionar ícone de seta */
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+  }
+  
+  .inv-client-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 0 4px 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 110;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .inv-client-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  
+  .inv-client-option:hover {
+    background: #f8fafc;
+  }
+  
+  .inv-filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+  }
+  
+  .inv-clear-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: white;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    height: 32px;
+    transition: all 0.2s;
+  }
+  
+  .inv-clear-button:hover {
+    background: #f1f5f9;
+    border-color: #D8337D;
+    color: #D8337D;
+  }
+  
+  .inv-filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+  }
+  
+  .inv-apply-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #670099;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    height: 32px;
+  }
+  
+  .inv-apply-button:hover {
+    background: #4a006f;
+  }
+
+.incident-filter-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 600px;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.incident-filter-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.incident-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.incident-filter-label {
+  font-size: 12px;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.incident-filter-input {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #1a202c;
+  background: white;
+  transition: all 0.2s;
+}
+
+.incident-filter-input:focus {
+  outline: none;
+  border-color: #670099;
+  box-shadow: 0 0 0 2px rgba(103, 0, 153, 0.1);
+}
+
+.date-picker-container {
+  width: 100%;
+}
+
+/* Sobrescrevendo estilos do DatePicker */
+.react-datepicker {
+  font-family: inherit !important;
+  border-color: #e2e8f0 !important;
+}
+
+.react-datepicker__header {
+  background-color: white !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-range {
+  background-color: #670099 !important;
+  color: white !important;
+}
+
+.react-datepicker__day--in-selecting-range {
+  background-color: rgba(103, 0, 153, 0.1) !important;
+}
+
+.incident-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.clear-button,
+.apply-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  height: 36px;
+}
+
+.clear-button {
+  background: white;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.clear-button:hover {
+  border-color: #D8337D;
+  color: #D8337D;
+}
+
+.apply-button {
+  background: #670099;
+  color: white;
+  border: none;
+}
+
+.apply-button:hover {
+  background: #4a006f;
+}

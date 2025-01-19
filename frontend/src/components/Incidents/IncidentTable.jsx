@@ -1,146 +1,81 @@
-import React, { useState } from 'react';
-import { FaFilter, FaChevronDown } from 'react-icons/fa';
+import React from 'react';
 import '../../styles/InventoryTables.css';
 
-const getFilterConfig = () => [
-  { key: 'protocolo', label: 'Protocolo', type: 'text' },
-  { key: 'data_abertura', label: 'Data de Abertura', type: 'date' },
-  { key: 'status', label: 'Status', type: 'select',
-    options: [
-      { value: 'aberto', label: 'Aberto' },
-      { value: 'em_andamento', label: 'Em Andamento' },
-      { value: 'fechado', label: 'Fechado' }
-    ]
-  },
-  { key: 'prioridade', label: 'Prioridade', type: 'select',
-    options: [
-      { value: 'baixa', label: 'Baixa' },
-      { value: 'media', label: 'Média' },
-      { value: 'alta', label: 'Alta' },
-      { value: 'critica', label: 'Crítica' }
-    ]
-  }
+const columns = [
+  { key: 'incidente', label: 'Incidente' },
+  { key: 'aberto_por', label: 'Aberto por' },
+  { key: 'origem', label: 'Origem' },
+  { key: 'categoria', label: 'Categoria' },
+  { key: 'subcategoria', label: 'Subcategoria' },
+  { key: 'subcategoria_detalhe', label: 'Detalhe Subcategoria' },
+  { key: 'tipo_contato', label: 'Tipo Contato' },
+  { key: 'fila', label: 'Fila' },
+  { key: 'data_abertura', label: 'Data Abertura' },
+  { key: 'data_fechamento', label: 'Data Fechamento' },
+  { key: 'data_resolucao', label: 'Data Resolução' },
+  { key: 'duracao', label: 'Duração' },
+  { key: 'status', label: 'Status' }
 ];
 
-const FiltersSection = ({ filters, setFilters }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const fields = getFilterConfig();
-  
-  return (
-    <div className="filters-container">
-      <div 
-        className="filters-header"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
-        <h3>
-          <FaFilter />
-          Filtros
-          <span className="active-filters-count">
-            {Object.keys(filters).length > 0 && `(${Object.keys(filters).length})`}
-          </span>
-        </h3>
-        <FaChevronDown 
-          className={`toggle-icon ${isExpanded ? 'expanded' : ''}`}
-        />
-      </div>
-      
-      <div className={`table-filters ${isExpanded ? 'expanded' : ''}`}>
-        <div className="filter-section">
-          {fields.map(field => (
-            <div key={field.key} className="filter-field">
-              <label>{field.label}</label>
-              {field.type === 'select' ? (
-                <select
-                  value={filters[field.key] || ''}
-                  onChange={(e) => setFilters(prev => ({
-                    ...prev,
-                    [field.key]: e.target.value
-                  }))}
-                >
-                  <option value="">Todos</option>
-                  {field.options.map(opt => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type={field.type}
-                  value={filters[field.key] || ''}
-                  onChange={(e) => setFilters(prev => ({
-                    ...prev,
-                    [field.key]: e.target.value
-                  }))}
-                  placeholder={`Filtrar por ${field.label.toLowerCase()}`}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-        {Object.keys(filters).length > 0 && (
-          <div className="filter-actions">
-            <button 
-              className="clear-filters"
-              onClick={() => setFilters({})}
-            >
-              Limpar Filtros ({Object.keys(filters).length})
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+function IncidentTable({ data, loading, onPageChange, totalPages, currentPage }) {
+  if (loading) return <div className="inventory-table-loading">Carregando...</div>;
 
-function IncidentTable() {
-  const [filters, setFilters] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 1; // Temporário até integrar com API
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('pt-BR');
+  };
 
   return (
     <div className="inventory-table-container">
-      <FiltersSection 
-        filters={filters}
-        setFilters={setFilters}
-      />
-
       <div className="table-wrapper">
         <table className="inventory-table">
           <thead>
             <tr>
-              <th>Protocolo</th>
-              <th>Data de Abertura</th>
-              <th>Status</th>
-              <th>Prioridade</th>
-              <th>Cliente</th>
-              <th>Descrição</th>
-              <th>Ações</th>
+              {columns.map(col => (
+                <th key={col.key}>{col.label}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {/* Dados serão inseridos aqui quando integrado com a API */}
+            {data.map((item, index) => (
+              <tr key={item.id || index}>
+                {columns.map(col => (
+                  <td key={col.key}>
+                    {col.key.includes('data') 
+                      ? formatDate(item[col.key])
+                      : item[col.key]}
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
 
-      <div className="pagination">
-        <button 
-          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-        >
-          Anterior
-        </button>
-        <span>
-          Página {currentPage} de {totalPages}
-        </span>
-        <button 
-          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-          disabled={currentPage === totalPages}
-        >
-          Próximo
-        </button>
-      </div>
+      {data.length > 0 && (
+        <div className="pagination">
+          <div className="pagination-info">
+            Mostrando {data.length} registros
+          </div>
+          <div className="pagination-controls">
+            <button 
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </button>
+            <span>
+              Página {currentPage} de {totalPages}
+            </span>
+            <button 
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Próximo
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

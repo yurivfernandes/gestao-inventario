@@ -296,3 +296,41 @@
     align-items: stretch;
   }
 }
+
+/* Estilo para o submenu do usuário */
+.user-menu {
+  position: relative;
+}
+
+.user-submenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(103, 0, 153, 1);
+  backdrop-filter: blur(10px);
+  border-radius: 4px;
+  min-width: 200px;
+  display: none;
+  list-style: none;
+  padding: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.user-menu:hover .user-submenu {
+  display: block;
+}
+
+.user-submenu li a {
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.user-submenu li a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
