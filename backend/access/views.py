@@ -1,5 +1,6 @@
 import json
 
+import requests
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -130,6 +131,7 @@ def profile_view(request):
         "last_name": user.last_name,
         "full_name": user.full_name,
         "company_name": user.company_name,
+        "is_staff": user.is_staff,  # Adicionar este campo
     }
     return Response(data)
 
@@ -148,3 +150,25 @@ def profile_update(request):
         return Response(
             {"message": str(e)}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def docs_proxy(request, path):
+    # Apenas usuários staff podem acessar a documentação
+    if not request.user.is_staff:
+        return Response({"error": "Acesso não autorizado"}, status=403)
+
+    base_url = "http://localhost:8000/api/docs/"
+    # Remove barras duplas que possam surgir na concatenação
+    full_url = f"{base_url.rstrip('/')}/{path.lstrip('/')}"
+
+    try:
+        response = requests.get(full_url)
+        return HttpResponse(
+            content=response.content,
+            status=response.status_code,
+            content_type=response.headers["Content-Type"],
+        )
+    except requests.RequestException as e:
+        return Response({"error": str(e)}, status=500)

@@ -9,7 +9,13 @@ import {
   FaClipboardCheck, 
   FaExclamationTriangle,
   FaThLarge, // Importar o ícone do fluxo
-  FaChartPie // Importar o ícone de relatórios
+  FaChartPie, // Importar o ícone de relatórios
+  FaBook, // Adicionar import para o ícone de documentação
+  FaUser,
+  FaServer,
+  FaReact,
+  FaCode, // Para o backend
+  FaFileAlt // Para o manual
 } from 'react-icons/fa';
 
 function WelcomePage() {
@@ -18,6 +24,11 @@ function WelcomePage() {
   useEffect(() => {
     document.title = 'Gestão de Inventário | Home';
   }, []);
+
+  const handleDocClick = (e, path) => {
+    e.preventDefault();
+    window.open('http://localhost:8000/api/docs/', '_blank');
+  };
 
   const cards = [
     {
@@ -45,6 +56,34 @@ function WelcomePage() {
       active: false,
       icon: <FaChartPie size={32} />,
       subItems: []
+    },
+    {
+      title: 'Documentação',
+      description: 'Acesse as documentações disponíveis do sistema',
+      active: user?.is_staff || false,
+      icon: <FaBook size={32} />,
+      subItems: [
+        { 
+          name: 'Documentação API', 
+          icon: <FaBook size={16} />, 
+          path: '#',  // mudado para '#' já que vamos usar handleDocClick
+        },
+        { 
+          name: 'Manual do Usuário', 
+          icon: <FaFileAlt size={16} />, 
+          path: '/documentation/manual'
+        },
+        { 
+          name: 'Backend', 
+          icon: <FaCode size={16} />, 
+          path: '/documentation/backend'
+        },
+        { 
+          name: 'Frontend', 
+          icon: <FaReact size={16} />, 
+          path: '/documentation/frontend'
+        }
+      ]
     }
   ];
 
@@ -77,10 +116,21 @@ function WelcomePage() {
                   <ul className="sub-items">
                     {card.subItems.map((item, i) => (
                       <li key={i}>
-                        <Link to={item.path}>
-                          <span className="sub-item-icon">{item.icon}</span>
-                          {item.name}
-                        </Link>
+                        {card.title === 'Documentação' ? (
+                          <a 
+                            href="#"
+                            onClick={handleDocClick}
+                            rel="noopener noreferrer"
+                          >
+                            <span className="sub-item-icon">{item.icon}</span>
+                            {item.name}
+                          </a>
+                        ) : (
+                          <Link to={item.path}>
+                            <span className="sub-item-icon">{item.icon}</span>
+                            {item.name}
+                          </Link>
+                        )}
                       </li>
                     ))}
                   </ul>

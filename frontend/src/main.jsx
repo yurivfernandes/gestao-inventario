@@ -8,6 +8,7 @@ import PasswordPage from './pages/PasswordPage';
 import InventoryPage from './pages/InventoryPage';
 import InventoryFlowPage from './pages/InventoryFlowPage'; // Importar a nova página
 import IncidentManagementPage from './pages/IncidentManagementPage';
+import DocumentationPage from './pages/DocumentationPage'; // Adicionar import
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -55,6 +56,14 @@ ReactDOM.render(
             element={
               <ProtectedRoute>
                 <IncidentManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/documentacao/:docType?"
+            element={
+              <ProtectedRoute>
+                <DocumentationPage />
               </ProtectedRoute>
             }
           />

@@ -11,6 +11,7 @@ const api = axios.create({
 const publicRoutes = [
   'access/login/',
   'access/signup/',
+  'docs/', // Adicionar rota da documentação como pública
 ];
 
 api.interceptors.request.use(config => {
