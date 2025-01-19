@@ -9,6 +9,7 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClient, setSelectedClient] = useState(filters.cliente || '');
   const [isClientDropdownOpen, setIsClientDropdownOpen] = useState(false);
+  const [localFilters, setLocalFilters] = useState({ ...filters });
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -43,13 +44,13 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
   };
 
   const handleApply = () => {
-    setFilters(prev => ({ ...prev, cliente: selectedClient }));
+    setFilters(prev => ({ ...prev, ...localFilters, cliente: selectedClient }));
     onApply();
     onClose();
   };
 
   const clearFilters = () => {
-    setFilters({});
+    setLocalFilters({});
     setSearchTerm(''); // Limpar o termo de busca do cliente
     setSelectedClient(''); // Limpar o cliente selecionado
   };
@@ -102,8 +103,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <input
             className="inv-filter-input"
             type="text"
-            value={filters.codigo_vivo || ''}
-            onChange={(e) => setFilters(prev => ({...prev, codigo_vivo: e.target.value}))}
+            value={localFilters.codigo_vivo || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, codigo_vivo: e.target.value}))}
           />
         </div>
 
@@ -112,8 +113,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <input
             className="inv-filter-input"
             type="text"
-            value={filters.codigo_sys_cliente || ''}
-            onChange={(e) => setFilters(prev => ({...prev, codigo_sys_cliente: e.target.value}))}
+            value={localFilters.codigo_sys_cliente || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, codigo_sys_cliente: e.target.value}))}
           />
         </div>
 
@@ -122,8 +123,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <input
             className="inv-filter-input"
             type="text"
-            value={filters.tipo_site || ''}
-            onChange={(e) => setFilters(prev => ({...prev, tipo_site: e.target.value}))}
+            value={localFilters.tipo_site || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, tipo_site: e.target.value}))}
           />
         </div>
 
@@ -132,8 +133,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <input
             className="inv-filter-input"
             type="text"
-            value={filters.tipo_negocio || ''}
-            onChange={(e) => setFilters(prev => ({...prev, tipo_negocio: e.target.value}))}
+            value={localFilters.tipo_negocio || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, tipo_negocio: e.target.value}))}
           />
         </div>
 
@@ -143,8 +144,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <input
             className="inv-filter-input"
             type="text"
-            value={filters.codigo_equipamento || ''}
-            onChange={(e) => setFilters(prev => ({...prev, codigo_equipamento: e.target.value}))}
+            value={localFilters.codigo_equipamento || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, codigo_equipamento: e.target.value}))}
           />
         </div>
 
@@ -153,8 +154,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <input
             className="inv-filter-input"
             type="text"
-            value={filters.tipo_equipamento || ''}
-            onChange={(e) => setFilters(prev => ({...prev, tipo_equipamento: e.target.value}))}
+            value={localFilters.tipo_equipamento || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, tipo_equipamento: e.target.value}))}
           />
         </div>
 
@@ -163,8 +164,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <input
             className="inv-filter-input"
             type="text"
-            value={filters.designador_equipamento || ''}
-            onChange={(e) => setFilters(prev => ({...prev, designador_equipamento: e.target.value}))}
+            value={localFilters.designador_equipamento || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, designador_equipamento: e.target.value}))}
           />
         </div>
 
@@ -174,8 +175,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <input
             className="inv-filter-input"
             type="text"
-            value={filters.codigo_servico || ''}
-            onChange={(e) => setFilters(prev => ({...prev, codigo_servico: e.target.value}))}
+            value={localFilters.codigo_servico || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, codigo_servico: e.target.value}))}
           />
         </div>
 
@@ -184,8 +185,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <input
             className="inv-filter-input"
             type="text"
-            value={filters.tipo_servico || ''}
-            onChange={(e) => setFilters(prev => ({...prev, tipo_servico: e.target.value}))}
+            value={localFilters.tipo_servico || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, tipo_servico: e.target.value}))}
           />
         </div>
 
@@ -194,8 +195,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <input
             className="inv-filter-input"
             type="text"
-            value={filters.designador_servico || ''}
-            onChange={(e) => setFilters(prev => ({...prev, designador_servico: e.target.value}))}
+            value={localFilters.designador_servico || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, designador_servico: e.target.value}))}
           />
         </div>
 
@@ -204,8 +205,8 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
           <label className="inv-filter-label">Status</label>
           <select
             className="inv-filter-input"
-            value={filters.status || ''}
-            onChange={(e) => setFilters(prev => ({...prev, status: e.target.value}))}
+            value={localFilters.status || ''}
+            onChange={(e) => setLocalFilters(prev => ({...prev, status: e.target.value}))}
           >
             <option value="">Todos</option>
             <option value="true">Ativo</option>
@@ -216,7 +217,7 @@ function FilterDropdown({ isOpen, onClose, filters, setFilters, onApply }) {
 
       <div className="inv-filter-actions">
         <button className="inv-clear-button" onClick={clearFilters}>
-          <MdFilterAltOff /> 
+          <MdFilterAltOff /> Limpar
         </button>
         <button className="inv-apply-button" onClick={handleApply}>
           <FaSearch /> Consultar

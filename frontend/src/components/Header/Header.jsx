@@ -6,31 +6,29 @@ import logo from '../../assets/logo.svg';
 import './../../styles//Header.css';
 
 function Header() {
-  const { logout, userData } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
 
   const menuItems = [
-    { 
-      icon: <FaUserCog />, 
-      text: "Perfil",
-      submenu: [
-        { to: "/perfil/senha", icon: <FaKey />, text: "Alterar Senha" }
-      ]
-    },
     { 
       icon: <FaDatabase />, 
       text: "Inventário",
       submenu: [
         { to: "/inventario", icon: <FaDatabase />, text: "Acessar Inventário" },
-        { to: "/inventario/flow", icon: <FaThLarge />, text: "Fluxo de Inventário" } // Adicionar a nova opção
+        { to: "/inventario/flow", icon: <FaThLarge />, text: "Fluxo de Inventário" }
       ]
     },
     { to: "/incidentes", icon: <FaChartBar />, text: "Gestão de Incidentes" },
   ];
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    setMenuOpen(!menuOpen);
   };
 
   return (
@@ -41,12 +39,12 @@ function Header() {
         </Link>
 
         <div className="hamburger" onClick={toggleMenu}>
-          <span className={`bar ${isMenuOpen ? 'active' : ''}`}></span>
-          <span className={`bar ${isMenuOpen ? 'active' : ''}`}></span>
-          <span className={`bar ${isMenuOpen ? 'active' : ''}`}></span>
+          <span className={`bar ${menuOpen ? 'active' : ''}`}></span>
+          <span className={`bar ${menuOpen ? 'active' : ''}`}></span>
+          <span className={`bar ${menuOpen ? 'active' : ''}`}></span>
         </div>
 
-        <nav className={`app-nav ${isMenuOpen ? 'active' : ''}`}>
+        <nav className={`app-nav ${menuOpen ? 'active' : ''}`}>
           <ul className="app-menu">
             {menuItems.map((item, index) => (
               <li key={index} className={item.submenu ? 'app-menu-item has-submenu' : 'app-menu-item'}>
@@ -76,15 +74,25 @@ function Header() {
               </li>
             ))}
             <li className="app-menu-divider" />
-            <li className="app-menu-item">
+            <li className="app-menu-item user-menu">
               <span className="user-name">
                 <FaUser />
-                <span>{`${userData?.first_name || ''} ${userData?.last_name || ''}`}</span>
+                <span>{`${user?.first_name || ''} ${user?.last_name || ''}`}</span>
               </span>
-              <button onClick={() => logout()} className="app-logout">
-                <FaSignOutAlt />
-                <span>Sair</span>
-              </button>
+              <ul className="user-submenu">
+                <li>
+                  <Link to="/perfil/senha">
+                    <FaKey />
+                    <span>Alterar Senha</span>
+                  </Link>
+                </li>
+                <li>
+                  <button onClick={handleLogout} className="app-logout">
+                    <FaSignOutAlt />
+                    <span>Sair</span>
+                  </button>
+                </li>
+              </ul>
             </li>
           </ul>
         </nav>

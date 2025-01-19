@@ -3,38 +3,27 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../styles/LoginPage.css';
 import logo from '../assets/logo_login.svg';
-import api from '../services/api'; // Import the api module
 
 function LoginPage() {
   useEffect(() => {
     document.title = 'Gestão de Inventário - Login';
+    const savedFormData = localStorage.getItem('loginFormData');
+    if (savedFormData) {
+      setFormData(JSON.parse(savedFormData));
+    }
   }, []);
 
   const navigate = useNavigate();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
-    password: '',
-    keepLoggedIn: false
+    password: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // Recuperar credenciais salvas
-    const savedCredentials = localStorage.getItem('savedCredentials');
-    if (savedCredentials) {
-      const { username, keepLoggedIn } = JSON.parse(savedCredentials);
-      setFormData(prev => ({
-        ...prev,
-        username,
-        keepLoggedIn: keepLoggedIn || false
-      }));
-    }
-  }, []);
-
   const handleChange = (e) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    const value = e.target.value;
     setFormData({
       ...formData,
       [e.target.name]: value
@@ -44,33 +33,27 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-
+    setError('');
+    localStorage.setItem('loginFormData', JSON.stringify(formData));
+    
     try {
-      const response = await api.post('access/login/', formData);
-      
-      if (response.data && response.data.token) {
-        // Salvar credenciais apenas se keepLoggedIn estiver marcado
-        if (formData.keepLoggedIn) {
-          const credentialsToSave = {
-            username: formData.username,
-            keepLoggedIn: true
-          };
-          localStorage.setItem('savedCredentials', JSON.stringify(credentialsToSave));
-        } else {
-          localStorage.removeItem('savedCredentials');
-        }
+      const response = await fetch('http://localhost:8000/api/access/login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
 
-        localStorage.setItem('token', response.data.token);
-        login(response.data.token);
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token);
+        await login(data.token);
         navigate('/welcome');
       } else {
-        setError('Resposta inválida do servidor');
-        console.error('Resposta inesperada:', response.data);
+        setError('Credenciais inválidas. Por favor, tente novamente.');
       }
-    } catch (err) {
-      console.error('Erro completo:', err.response?.data || err);
-      setError(err.response?.data?.error || 'Erro ao realizar login');
+    } catch (error) {
+      setError('Erro ao conectar com o servidor. Tente novamente mais tarde.');
     } finally {
       setLoading(false);
     }
@@ -113,21 +96,10 @@ function LoginPage() {
             />
           </div>
 
-          <div className="keep-logged-in">
-            <input
-              type="checkbox"
-              id="keepLoggedIn"
-              name="keepLoggedIn"
-              checked={formData.keepLoggedIn}
-              onChange={handleChange}
-            />
-            <label htmlFor="keepLoggedIn">Manter conectado</label>
-          </div>
-
           {error && <div className="error-message">{error}</div>}
 
-          <button type="submit" className="login-button">
-            Entrar
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
       </div>

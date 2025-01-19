@@ -1,10 +1,8 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
 from django.db import models
 
 
 class User(AbstractUser):
-    # Validadores personalizados
     username = models.CharField(
         max_length=150,
         unique=True,
@@ -28,7 +26,6 @@ class User(AbstractUser):
     )
 
     def save(self, *args, **kwargs):
-        # Garantir primeira letra maiúscula
         if self.full_name:
             self.full_name = " ".join(
                 word.capitalize() for word in self.full_name.split()
@@ -37,7 +34,5 @@ class User(AbstractUser):
             self.company_name = " ".join(
                 word.capitalize() for word in self.company_name.split()
             )
-        # Garantir username minúsculo
         self.username = self.username.lower()
-
         super().save(*args, **kwargs)

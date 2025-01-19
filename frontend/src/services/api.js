@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: 'http://localhost:8000/api', // Verifique se esta URL está correta
   headers: {
     'Content-Type': 'application/json',
   },
@@ -19,7 +19,7 @@ api.interceptors.request.use(config => {
   if (!isPublicRoute) {
     const token = localStorage.getItem('token');
     if (token) {
-      config.headers.Authorization = `Token ${token}`; // Alterado para Token
+      config.headers.Authorization = `Token ${token}`;
     }
   }
   
@@ -32,7 +32,6 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
-    // Removido redirecionamento automático para login em caso de erro 401
     return Promise.reject(error);
   }
 );

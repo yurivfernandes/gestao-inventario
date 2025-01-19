@@ -158,8 +158,8 @@ function PasswordPage() {
               </div>
             )}
 
-            <button type="submit" className="save-button">
-              Salvar Nova Senha
+            <button type="submit" className="change-password-button">
+              Alterar a senha
             </button>
           </form>
         </div>
