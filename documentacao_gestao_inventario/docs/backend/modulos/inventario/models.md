@@ -1,11 +1,47 @@
 # Models do Módulo Inventário
 
 ## Visão Geral
-O módulo de inventário é composto por 4 models principais que representam a estrutura hierárquica do inventário:
+O módulo de inventário é composto por 5 models principais que representam a estrutura hierárquica do inventário:
+- Grupo Econômico
 - Cliente
 - Site
 - Equipamento
 - Serviço
+
+## Model Grupo Econômico
+Representa os grupos econômicos que agrupam clientes no sistema.
+
+### Definição Django
+```python
+class GrupoEconomico(models.Model):
+    nome = models.CharField(max_length=255)
+    codigo = models.CharField(max_length=30)
+    status = models.BooleanField()
+
+    class Meta:
+        db_table = 'd_grupo_economico'
+```
+
+### SQL Equivalente
+```sql
+CREATE TABLE d_grupo_economico (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255) NOT NULL,
+    codigo VARCHAR(30) NOT NULL,
+    status BOOLEAN NOT NULL
+);
+```
+
+### C# Equivalente
+```csharp
+public class GrupoEconomico
+{
+    public long Id { get; set; }
+    public string Nome { get; set; }
+    public string Codigo { get; set; }
+    public bool Status { get; set; }
+}
+```
 
 ## Model Cliente
 Representa os clientes no sistema.
@@ -13,6 +49,7 @@ Representa os clientes no sistema.
 ### Definição Django
 ```python
 class Cliente(models.Model):
+    grupo_economico = models.ForeignKey(GrupoEconomico, on_delete=models.CASCADE)
     vantive_id = models.IntegerField()
     razao_social = models.CharField(max_length=255)
     codigo = models.CharField(max_length=30)
@@ -27,11 +64,13 @@ class Cliente(models.Model):
 ```sql
 CREATE TABLE d_cliente (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    grupo_economico_id BIGINT NOT NULL,
     vantive_id INT NOT NULL,
     razao_social VARCHAR(255) NOT NULL,
     codigo VARCHAR(30) NOT NULL,
     status BOOLEAN NOT NULL,
-    cnpj VARCHAR(18) NOT NULL
+    cnpj VARCHAR(18) NOT NULL,
+    FOREIGN KEY (grupo_economico_id) REFERENCES d_grupo_economico(id)
 );
 ```
 
@@ -40,6 +79,8 @@ CREATE TABLE d_cliente (
 public class Cliente
 {
     public long Id { get; set; }
+    public long GrupoEconomicoId { get; set; }
+    public GrupoEconomico GrupoEconomico { get; set; }
     public int VantiveId { get; set; }
     public string RazaoSocial { get; set; }
     public string Codigo { get; set; }
@@ -193,8 +234,9 @@ public class Servico
 
 A estrutura do inventário segue uma hierarquia onde:
 
-1. Um **Cliente** pode ter vários **Sites**
-2. Um **Site** pode ter vários **Equipamentos**
-3. Um **Equipamento** pode ter vários **Serviços**
+1. Um **Grupo Econômico** pode ter vários **Clientes**
+2. Um **Cliente** pode ter vários **Sites**
+3. Um **Site** pode ter vários **Equipamentos**
+4. Um **Equipamento** pode ter vários **Serviços**
 
 Todos os relacionamentos são do tipo CASCADE, significando que ao deletar um registro pai, todos os registros filhos serão automaticamente removidos.

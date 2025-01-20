@@ -79,7 +79,7 @@ public async Task<ActionResult<PagedResult<Site>>> GetSites(
     [FromQuery] int clienteId,
     [FromQuery] string search,
     [FromQuery] int page = 1)
-{
+{ 
     if (clienteId == 0)
         return BadRequest(new { error = "Cliente é obrigatório" });
 

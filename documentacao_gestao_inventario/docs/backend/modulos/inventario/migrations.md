@@ -61,6 +61,15 @@ CREATE TABLE d_servico (
 );
 ```
 
+5. **Tabela Grupo Econômico (d_grupo_economico)**
+```sql
+CREATE TABLE d_grupo_economico (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255) NOT NULL,
+    status BOOLEAN NOT NULL
+);
+```
+
 ### Equivalente C# (Entity Framework)
 
 ```csharp
@@ -96,6 +105,14 @@ public class InventarioDbContext : DbContext
                   .WithMany(c => c.Sites)
                   .HasForeignKey(e => e.ClienteId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<GrupoEconomico>(entity =>
+        {
+            entity.ToTable("d_grupo_economico");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Nome).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Status).IsRequired();
         });
 
         // Configurações similares para Equipamento e Serviço
