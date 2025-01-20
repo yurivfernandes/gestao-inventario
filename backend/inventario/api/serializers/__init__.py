@@ -1,4 +1,5 @@
 from .cliente_serializer import ClienteSerializer
 from .equipamento_serializer import EquipamentoSerializer
+from .grupo_economico import GrupoEconomicoSerializer
 from .servico_serializer import ServicoSerializer
 from .site_serializer import SiteSerializer

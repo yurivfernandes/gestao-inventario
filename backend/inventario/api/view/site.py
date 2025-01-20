@@ -1,24 +1,34 @@
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ...models import Site
+from ...models import Cliente, GrupoEconomico, Site
 from ..serializers import SiteSerializer
 
 
 class SiteListCreate(APIView):
     def get(self, request):
         try:
-            cliente_id = request.query_params.get("cliente")
-            if not cliente_id:
-                return Response(
-                    {"error": "Cliente é obrigatório"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+            grupo_economico_id = request.query_params.get("grupo_economico")
+            grupo_economico = get_object_or_404(
+                GrupoEconomico, pk=grupo_economico_id
+            )
 
-            sites = Site.objects.filter(cliente_id=cliente_id)
+            sites = Site.objects.filter(
+                cliente__grupo_economico=grupo_economico
+            )
+
+            cliente_id = request.query_params.get("cliente")
+            if cliente_id:
+                cliente = get_object_or_404(
+                    Cliente, pk=cliente_id, grupo_economico=grupo_economico
+                )
+                sites = sites.filter(cliente=cliente)
+
             search = request.query_params.get("search")
             if search:
                 sites = sites.filter(
@@ -59,10 +69,13 @@ class SiteListCreate(APIView):
 
 class SiteUpdate(APIView):
     def put(self, request, pk):
-        try:
-            site = Site.objects.get(pk=pk)
-        except Site.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        grupo_economico_id = request.query_params.get("grupo_economico")
+        grupo_economico = get_object_or_404(
+            GrupoEconomico, pk=grupo_economico_id
+        )
+        site = get_object_or_404(
+            Site, pk=pk, cliente__grupo_economico=grupo_economico
+        )
 
         serializer = SiteSerializer(site, data=request.data)
         if serializer.is_valid():
