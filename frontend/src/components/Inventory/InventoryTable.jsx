@@ -9,6 +9,7 @@ const columns = {
     { key: 'cnpj', label: 'CNPJ' },
     { key: 'vantive_id', label: 'Vantive ID' },
     { key: 'codigo', label: 'Código' },
+    { key: 'status_vantive', label: 'Status Vantive' },
     { key: 'status', label: 'Status' }
   ],
   sites: [
@@ -28,6 +29,11 @@ const columns = {
     { key: 'codigo', label: 'Código' },
     { key: 'tipo', label: 'Tipo' },
     { key: 'designador', label: 'Designador' },
+    { key: 'status', label: 'Status' }
+  ],
+  economic_groups: [
+    { key: 'razao_social', label: 'Razão Social' },
+    { key: 'codigo', label: 'Código' },
     { key: 'status', label: 'Status' }
   ]
 };
@@ -74,6 +80,9 @@ function InventoryTable({ type, data, loading, onPageChange, totalPages, current
         case 'services':
           endpoint = `/inventario/servicos/${editItemId}/`;
           break;
+        case 'economic_groups':
+          endpoint = `/inventario/grupos-economicos/${editItemId}/`;
+          break;
         default:
           return;
       }
@@ -87,6 +96,18 @@ function InventoryTable({ type, data, loading, onPageChange, totalPages, current
 
   const handleCancel = () => {
     setEditItemId(null);
+  };
+
+  const renderCellContent = (item, col) => {
+    if (col.key === 'grupo_economico') {
+      return item.grupo_economico?.razao_social || '';
+    }
+    
+    if (col.key === 'status' || col.key === 'status_vantive') {
+      return item[col.key] ? 'Ativo' : 'Inativo';
+    }
+    
+    return item[col.key];
   };
 
   if (loading) return <div className="inventory-table-loading">Carregando...</div>;
@@ -107,28 +128,32 @@ function InventoryTable({ type, data, loading, onPageChange, totalPages, current
             {data.map((item, index) => (
               <tr key={item.id || index}>
                 {columns[type].map(col => (
-                  <td key={col.key} data-status={col.key === 'status' ? item[col.key] : undefined}>
+                  <td key={col.key} 
+                      data-status={col.key === 'status' || col.key === 'status_vantive' ? item[col.key] : undefined}>
                     {editItemId === item.id ? (
-                      col.key === 'status' ? (
+                      col.key === 'status' || col.key === 'status_vantive' ? (
                         <label className="switch">
                           <input
                             type="checkbox"
+                            name={col.key}
                             checked={editItemData[col.key]}
                             onChange={handleToggleChange}
                           />
                           <span className="slider round"></span>
                         </label>
+                      ) : col.key === 'grupo_economico' ? (
+                        item.grupo_economico?.razao_social
                       ) : (
                         <input
                           type="text"
                           name={col.key}
-                          value={editItemData[col.key]}
+                          value={editItemData[col.key] || ''}
                           onChange={handleInputChange}
                           className="edit-input"
                         />
                       )
                     ) : (
-                      col.key === 'status' ? (item[col.key] ? 'Ativo' : 'Inativo') : item[col.key]
+                      renderCellContent(item, col)
                     )}
                   </td>
                 ))}

@@ -52,6 +52,32 @@
 
 .search-input-container {
   position: relative;
+  width: 100%;
+}
+
+.clear-input-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.clear-input-button:hover {
+  color: #64748b;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.inv-filter-input[disabled] + .clear-input-button {
+  display: none;
 }
 
 .client-search {
@@ -116,13 +142,12 @@
 
 .inv-filter-dropdown {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);  /* 8px de espaço do botão */
   right: 0;
   width: 320px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  margin-top: 0.5rem;
   z-index: 1000;
 }
 
@@ -203,13 +228,17 @@
   top: 100%;
   left: 0;
   width: 100%;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 0 0 4px 4px;
   max-height: 200px;
   overflow-y: auto;
-  z-index: 110;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0 0 8px 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1100; /* Aumentado para garantir que fique sobre outros elementos */
+}
+
+.inv-filter-field {
+  position: relative; /* Importante para o posicionamento do dropdown */
 }
 
 .inv-client-option {
@@ -291,4 +320,29 @@
   font-size: 0.75rem;
   margin-top: 0.25rem;
   display: block;
+}
+
+/* Adicione estes estilos ao seu arquivo CSS */
+.inv-filter-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.inv-filter-row .inv-filter-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Ajuste para o dropdown do cliente não quebrar o layout */
+.inv-filter-row .client-search {
+  position: relative;
+}
+
+.inv-filter-row .inv-client-dropdown {
+  width: 100%;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
 }

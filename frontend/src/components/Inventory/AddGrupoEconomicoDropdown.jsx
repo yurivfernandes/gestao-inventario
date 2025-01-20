@@ -1,47 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaSave, FaTimes } from 'react-icons/fa';
 import api from '../../services/api';
-import '../../styles/FilterDropdown.css';
 
-function AddClientDropdown({ isOpen, onClose, onSuccess }) {
-  const [gruposEconomicos, setGruposEconomicos] = useState([]);
-  const [isGrupoDropdownOpen, setIsGrupoDropdownOpen] = useState(false);
-  const [grupoSearchTerm, setGrupoSearchTerm] = useState('');
+function AddGrupoEconomicoDropdown({ isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
-    grupo_economico: '',
     razao_social: '',
     cnpj: '',
     vantive_id: '',
     codigo: '',
     status: true
   });
-  
   const [errors, setErrors] = useState({});
+  const [error, setError] = useState('');
   const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    const fetchGruposEconomicos = async () => {
-      try {
-        const response = await api.get('/inventario/grupos-economicos/');
-        setGruposEconomicos(response.data.results);
-      } catch (error) {
-        console.error('Erro ao carregar grupos econômicos:', error);
-      }
-    };
-
-    fetchGruposEconomicos();
-  }, []);
 
   const formatCNPJ = (value) => {
     const numbers = value.replace(/\D/g, '').substring(0, 14);
@@ -54,13 +25,9 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
 
   const validateCNPJ = (cnpj) => {
     const numbers = cnpj.replace(/\D/g, '');
-    
     if (numbers.length !== 14) return false;
-    
-    // Elimina CNPJs inválidos conhecidos
     if (/^(\d)\1{13}$/.test(numbers)) return false;
     
-    // Validação do algoritmo
     let length = numbers.length - 2;
     let numbers_array = numbers.substring(0, length);
     const digits = numbers.substring(length);
@@ -89,8 +56,8 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
     return result === parseInt(digits.charAt(1));
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
     
     if (name === 'cnpj') {
       const formattedCNPJ = formatCNPJ(value);
@@ -112,12 +79,13 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
     } else {
       setFormData(prev => ({
         ...prev,
-        [name]: value
+        [name]: type === 'checkbox' ? checked : value
       }));
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const unformattedCNPJ = formData.cnpj.replace(/\D/g, '');
     
     if (!validateCNPJ(unformattedCNPJ)) {
@@ -128,13 +96,12 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
     try {
       const dataToSend = {
         ...formData,
-        cnpj: unformattedCNPJ // Envia apenas os números
+        cnpj: unformattedCNPJ
       };
       
-      await api.post('/inventario/clientes/', dataToSend);
+      await api.post('/inventario/grupos-economicos/', dataToSend);
       onSuccess();
       setFormData({
-        grupo_economico: '',
         razao_social: '',
         cnpj: '',
         vantive_id: '',
@@ -142,62 +109,25 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
         status: true
       });
       setErrors({});
+      setError('');
     } catch (error) {
       if (error.response?.data?.cnpj) {
         setErrors(prev => ({ ...prev, cnpj: 'CNPJ já cadastrado' }));
       }
-      console.error('Erro ao adicionar cliente:', error);
+      setError('Erro ao adicionar grupo econômico. Verifique os dados e tente novamente.');
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="inv-filter-dropdown" ref={dropdownRef}>
+    <div className="inv-filter-dropdown" ref={dropdownRef} 
+         onClick={(e) => e.stopPropagation()}> {/* Adicionar isso para prevenir propagação */}
       <div className="inv-dropdown-header">
-        <h3>Adicionar Cliente</h3>
+        <h3>Adicionar Grupo Econômico</h3>
       </div>
       <div className="inv-filter-content">
-        <div className="inv-filter-field">
-          <label className="inv-filter-label">Grupo Econômico</label>
-          <input
-            className="inv-filter-input"
-            type="text"
-            value={grupoSearchTerm}
-            onChange={(e) => {
-              setGrupoSearchTerm(e.target.value);
-              setIsGrupoDropdownOpen(true);
-            }}
-            onFocus={() => setIsGrupoDropdownOpen(true)}
-            placeholder="Pesquisar grupo econômico..."
-          />
-          {isGrupoDropdownOpen && (
-            <div className="inv-client-dropdown">
-              {gruposEconomicos
-                .filter(grupo => 
-                  grupo.razao_social.toLowerCase().includes(grupoSearchTerm.toLowerCase())
-                )
-                .map(grupo => (
-                  <div
-                    key={grupo.id}
-                    className="inv-client-option"
-                    onClick={() => {
-                      setFormData(prev => ({
-                        ...prev,
-                        grupo_economico: grupo.id
-                      }));
-                      setGrupoSearchTerm(grupo.razao_social);
-                      setIsGrupoDropdownOpen(false);
-                    }}
-                  >
-                    {grupo.razao_social}
-                  </div>
-                ))
-              }
-            </div>
-          )}
-        </div>
-
+        {error && <div className="error-message">{error}</div>}
         <div className="inv-filter-field">
           <label className="inv-filter-label">Razão Social</label>
           <input
@@ -205,7 +135,7 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
             type="text"
             name="razao_social"
             value={formData.razao_social}
-            onChange={handleInputChange}
+            onChange={handleChange}
             required
           />
         </div>
@@ -222,9 +152,10 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
             type="text"
             name="cnpj"
             value={formData.cnpj}
-            onChange={handleInputChange}
+            onChange={handleChange}
             placeholder="00.000.000/0000-00"
             maxLength={18}
+            required
           />
         </div>
 
@@ -235,7 +166,7 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
             type="text"
             name="vantive_id"
             value={formData.vantive_id}
-            onChange={handleInputChange}
+            onChange={handleChange}
             required
           />
         </div>
@@ -247,18 +178,17 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
             type="text"
             name="codigo"
             value={formData.codigo}
-            onChange={handleInputChange}
+            onChange={handleChange}
             required
           />
         </div>
-
         <div className="inv-filter-field">
           <label className="inv-filter-label">Status</label>
           <select
             className="inv-filter-input"
             name="status"
             value={formData.status}
-            onChange={handleInputChange}
+            onChange={handleChange}
           >
             <option value={true}>Ativo</option>
             <option value={false}>Inativo</option>
@@ -278,4 +208,4 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
   );
 }
 
-export default AddClientDropdown;
+export default AddGrupoEconomicoDropdown;
