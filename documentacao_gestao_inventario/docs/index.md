@@ -1,6 +1,8 @@
-# Sistema de Gestão de Inventário
+<p style="text-align: left;">
+    <img src="assets/images/logo_login.svg" alt="Logo" width="150" />
+</p>
 
-![Logo](images/logo_login.svg)
+# Sistema de Gestão de Inventário
 
 Bem-vindo à documentação do Sistema de Gestão de Inventário. Esta documentação está dividida em três seções principais:
 
