@@ -12,11 +12,27 @@ nav:
           - Fluxo de Inventário: manual/inventario/fluxo.md
       - Gestão de Incidentes: manual/incidentes.md
   - Backend:
+      - Introdução: backend/index.md
       - Módulos:
-          - Access: backend/modulos/access.md
-          - App: backend/modulos/app.md
+          - Access:
+              - Visão Geral: backend/modulos/access.md
+              - Login: backend/modulos/access/login.md
+              - Perfil: backend/modulos/access/profile.md
+              - Permissões: backend/modulos/access/permissions.md
+              - URLs e Rotas: backend/modulos/access/urls.md
+          - App:
+              - Visão Geral: backend/modulos/app/app.md
+              - Configurações: backend/modulos/app/settings.md
+              - URLs e Rotas: backend/modulos/app/urls.md
+              - WSGI/ASGI: backend/modulos/app/wsgi_asgi.md
           - Docs: backend/modulos/docs.md
-          - Incidentes: backend/modulos/incidentes.md
+          - Incidentes:
+              - Visão Geral: backend/modulos/incidentes/incidentes.md
+              - Modelo: backend/modulos/incidentes/modelo.md
+              - API: backend/modulos/incidentes/api.md
+              - Serialização: backend/modulos/incidentes/serializacao.md
+              - Migrations: backend/modulos/incidentes/migrations.md
+              - Inicialização: backend/modulos/incidentes/init.md
           - Inventário: backend/modulos/inventario.md
   - Frontend:
       - Páginas:
