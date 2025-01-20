@@ -1,4 +1,47 @@
-# Documentação Backend
+# Backend do Sistema
+
+## Visão Geral
+O backend do sistema foi desenvolvido utilizando Python com Django, uma combinação poderosa para desenvolvimento web. Se você vem do mundo C#, pode considerar o Django como algo similar ao ASP.NET Core.
+
+## Por Onde Começar
+
+1. **Novo no Python e Django?**
+   - Comece pela seção "Preparação do Ambiente"
+   - Siga o passo a passo de instalação do Python
+   - Configure seu ambiente de desenvolvimento
+
+2. **Familiarizado com C#/ASP.NET?**
+   - Veja nossos paralelos entre Django e ASP.NET
+   - Entenda as diferenças principais
+   - Aproveite seu conhecimento existente
+
+3. **Quer Entender a Estrutura?**
+   - Explore a seção "Conceitos"
+   - Veja como o projeto está organizado
+   - Entenda o fluxo de dados
+
+## Estrutura da Documentação
+
+1. **Preparação do Ambiente**
+   - Como instalar o Python
+   - Como configurar o projeto
+   - Configuração do VS Code
+
+2. **Tecnologias**
+   - Django Framework
+   - Django REST Framework
+   - Outros pacotes importantes
+
+3. **Conceitos Fundamentais**
+   - Models e Banco de Dados
+   - Sistema de Migrations
+   - Estrutura do Projeto
+
+4. **Módulos do Sistema**
+   - Access (Autenticação)
+   - App (Configurações)
+   - Inventário
+   - Incidentes
 
 ## Tecnologias Utilizadas
 

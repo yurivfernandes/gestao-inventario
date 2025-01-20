@@ -13,6 +13,23 @@ nav:
       - Gestão de Incidentes: manual/incidentes.md
   - Backend:
       - Introdução: backend/index.md
+      - Ambiente:
+          - Visão Geral: backend/ambiente/index.md
+          - Instalação do Python: backend/ambiente/instalacao-python.md
+          - Configuração do Projeto: backend/ambiente/configuracao-projeto.md
+          - VS Code e Extensões: backend/ambiente/vscode.md
+      - Stack Tecnológica:
+          - Visão Geral: backend/tecnologias/index.md
+          - Django Framework: backend/tecnologias/django.md
+          - Django REST Framework: backend/tecnologias/drf.md
+          - Pacotes e Dependências: backend/tecnologias/pacotes.md
+      - Fundamentos:
+          - Visão Geral: backend/conceitos/index.md
+          - Models e Banco de Dados: backend/conceitos/models-db.md
+          - Sistema de Migrations: backend/conceitos/migrations.md
+          - Queries e Views: backend/conceitos/queries.md
+          - Estrutura do Projeto: backend/conceitos/estrutura.md
+          - Boas Práticas: backend/conceitos/boas-praticas.md
       - Módulos:
           - Access:
               - Visão Geral: backend/modulos/access.md
@@ -28,12 +45,18 @@ nav:
           - Docs: backend/modulos/docs.md
           - Incidentes:
               - Visão Geral: backend/modulos/incidentes/incidentes.md
-              - Modelo: backend/modulos/incidentes/modelo.md
-              - API: backend/modulos/incidentes/api.md
-              - Serialização: backend/modulos/incidentes/serializacao.md
+              - Models: backend/modulos/incidentes/modelo.md
+              - Views: backend/modulos/incidentes/api.md
+              - Serializers: backend/modulos/incidentes/serializacao.md
               - Migrations: backend/modulos/incidentes/migrations.md
               - Inicialização: backend/modulos/incidentes/init.md
-          - Inventário: backend/modulos/inventario.md
+          - Inventário:
+              - Visão Geral: backend/modulos/inventario/inventario.md
+              - Models: backend/modulos/inventario/models.md
+              - Views: backend/modulos/inventario/views.md
+              - Serializers: backend/modulos/inventario/serializers.md
+              - Migrations: backend/modulos/inventario/migrations.md
+              - Inicialização: backend/modulos/inventario/init.md
   - Frontend:
       - Páginas:
           - Login: frontend/paginas/login.md
@@ -48,12 +71,20 @@ theme:
   logo: assets/images/logo.svg
   favicon: assets/images/favicon.svg
   palette:
-    - scheme: default
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
       primary: custom
       accent: deep purple
       toggle:
         icon: material/brightness-7
-        name: Switch to dark mode
+        name: Mudar para modo escuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Mudar para modo claro
   language: pt-BR
   features:
     - navigation.instant
