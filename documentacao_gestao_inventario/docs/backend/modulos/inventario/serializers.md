@@ -10,7 +10,7 @@ class ClienteSerializer(serializers.ModelSerializer):
         model = Cliente
         fields = "__all__"
 ```
-
+ 
 ### Equivalente C#
 ```csharp
 public class ClienteDto
