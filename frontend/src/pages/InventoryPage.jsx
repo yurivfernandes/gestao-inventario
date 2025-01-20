@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaFilter } from 'react-icons/fa';
+import { FaFilter, FaPlus } from 'react-icons/fa';
 import Header from '../components/Header/Header';
 import FilterDropdown from '../components/Inventory/FilterDropdown';
+import AddClientDropdown from '../components/Inventory/AddClientDropdown';
 import InventoryTable from '../components/Inventory/InventoryTable';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -33,6 +34,7 @@ function InventoryPage() {
     services: 1
   });
   const [currentPage, setCurrentPage] = useState(1);
+  const [isAddOpen, setIsAddOpen] = useState(false);
 
   const fetchData = async (type, page = 1) => {
     try {
@@ -90,6 +92,12 @@ function InventoryPage() {
     setCurrentPage(1); // Resetar a página ao mudar de aba
   };
 
+  // Adicione esta função
+  const handleAddSuccess = () => {
+    setIsAddOpen(false);
+    fetchData(activeTab, currentPage);
+  };
+
   return (
     <div className="inventory-page">
       <Header />
@@ -110,7 +118,16 @@ function InventoryPage() {
             </div>
           </div>
 
-          <div className="filter-container">
+          <div className="actions-container">
+            {activeTab === 'clients' && (
+              <button 
+                className="action-button"
+                onClick={() => setIsAddOpen(!isAddOpen)}
+              >
+                <FaPlus /> Adicionar Cliente
+              </button>
+            )}
+
             <button 
               className="filter-button"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -132,6 +149,14 @@ function InventoryPage() {
                 onClose={() => setIsFilterOpen(false)}
               />
             )}
+
+            {isAddOpen && activeTab === 'clients' && (
+              <AddClientDropdown
+                isOpen={isAddOpen}
+                onClose={() => setIsAddOpen(false)}
+                onSuccess={handleAddSuccess}
+              />
+            )}
           </div>
         </div>
 
@@ -150,5 +175,6 @@ function InventoryPage() {
     </div>
   );
 }
+
 
 export default InventoryPage;
