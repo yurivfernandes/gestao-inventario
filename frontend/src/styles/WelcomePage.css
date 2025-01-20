@@ -57,7 +57,9 @@
 }
 
 .welcome-header h1 {
-  background: linear-gradient(90deg, #670099, #C92C82);
+  background: linear-gradient(20deg, 
+  rgba(103, 0, 153, 1) 60%,
+  rgba(201, 44, 130, 1) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 2.5rem;
@@ -83,7 +85,9 @@
 }
 
 .welcome-container .welcome-card {
-  background: linear-gradient(40deg, #670099, #C92C82);
+  background: linear-gradient(20deg, 
+  rgba(103, 0, 153, 1) 60%,
+  rgba(201, 44, 130, 1) 100%);
   border-radius: 12px;
   padding: 2rem;
   transition: all 0.3s ease;
@@ -195,7 +199,9 @@
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #6B46C1, #D8337D);
+  background: linear-gradient(20deg, 
+  rgba(103, 0, 153, 1) 60%,
+  rgba(201, 44, 130, 1) 100%);
   opacity: 0.7;
 }
 

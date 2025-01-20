@@ -104,7 +104,9 @@
 
 .login-button {
   width: 80%;
-  background: linear-gradient(45deg, #6F0FAF, #A388FF);
+  background: linear-gradient(20deg, 
+  rgba(103, 0, 153, 1) 60%,
+  rgba(201, 44, 130, 1) 100%); 
   color: white;
   height: 2.8rem;
   padding: 1rem;
