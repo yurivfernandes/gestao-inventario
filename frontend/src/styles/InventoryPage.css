@@ -104,11 +104,12 @@
 }
 
 .actions-container {
-  position: relative;  /* Adicione esta linha */
+  position: relative;  /* Mantém o container como relativo */
   display: flex;
   gap: 1rem;
   order: 2;
   align-self: flex-start;
+  z-index: 1000; /* Garante que o dropdown fique sobre outros elementos */
 }
 
 .action-button {
@@ -135,4 +136,10 @@
 
 .filter-button:hover {
   background: #4a006f;
+}
+
+/* Adicione estes estilos */
+.dropdown-wrapper {
+  position: relative;
+  display: inline-block;
 }

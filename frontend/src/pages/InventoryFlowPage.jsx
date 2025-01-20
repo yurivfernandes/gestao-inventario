@@ -10,6 +10,7 @@ function InventoryFlowPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [data, setData] = useState({
+    economic_groups: { results: [], count: 0, currentPage: 1 },
     clients: { results: [], count: 0, currentPage: 1 },
     sites: {},
     equipments: {},
@@ -17,19 +18,16 @@ function InventoryFlowPage() {
   });
 
   useEffect(() => {
-    fetchClients(1);
+    fetchGruposEconomicos(1);
   }, []);
 
-  const fetchClients = async (page = 1) => {
+  const fetchGruposEconomicos = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await api.get(`/inventario/clientes/?page=${page}`, {
-        headers: { Authorization: `Token ${token}` }
-      });
-      
-      setData(prev => ({ 
-        ...prev, 
-        clients: {
+      const response = await api.get(`/inventario/grupos-economicos/?page=${page}`);
+      setData(prev => ({
+        ...prev,
+        economic_groups: {
           results: response.data.results,
           count: response.data.count,
           currentPage: response.data.current_page,
@@ -37,78 +35,54 @@ function InventoryFlowPage() {
         }
       }));
     } catch (err) {
-      setError('Erro ao carregar dados');
+      setError('Erro ao carregar grupos econômicos');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchChildData = async (type, parentId, page = 1, params = {}) => {
-    if (!parentId && type !== 'clients') return;
-
+  const fetchChildData = async (type, parentId, params = {}) => {
     try {
-      // Converter 'equipment' para 'equipamento' nos parâmetros
-      const adjustedParams = {...params};
-      if (adjustedParams.equipment) {
-        adjustedParams.equipamento = adjustedParams.equipment;
-        delete adjustedParams.equipment;
-      }
-
       const queryParams = new URLSearchParams({
-        page: String(page),
-        ...adjustedParams
+        page: String(params.page || 1),
+        ...params
       });
 
-      if (type === 'clients') {
-        const queryParams = new URLSearchParams({
-          page: page,
-          ...params
-        });
+      let endpoint = `/inventario/${getEndpoint(type)}/?${queryParams}`;
+      console.log('Fetching:', endpoint); // Para debug
 
-        const response = await api.get(`/inventario/clientes/?${queryParams}`, {
-          headers: { Authorization: `Token ${token}` }
-        });
-        
-        setData(prev => ({
-          ...prev,
-          clients: {
-            results: response.data.results,
-            count: response.data.count,
-            currentPage: response.data.current_page,
-            numPages: response.data.num_pages
-          }
-        }));
-        return;
-      }
-
-      const baseEndpoints = {
-        sites: `/inventario/sites/?cliente=${parentId}`,
-        equipments: `/inventario/equipamentos/?cliente=${parentId}`,
-        services: `/inventario/servicos/?cliente=${parentId}`
-      };
-
-      // Correção na construção da URL
-      const url = `${baseEndpoints[type]}&${queryParams.toString()}`;
-      console.log('Fetching URL:', url); // Para debug
-
-      const response = await api.get(url, {
-        headers: { Authorization: `Token ${token}` }
-      });
+      const response = await api.get(endpoint);
       
+      // Atualizar o estado com os novos dados
       setData(prev => ({
         ...prev,
-        [type]: { 
-          ...prev[type], 
-          [parentId]: {
-            results: response.data.results,
-            count: response.data.count,
-            currentPage: response.data.current_page,
-            numPages: response.data.num_pages
-          }
+        [type]: {
+          results: response.data.results,
+          count: response.data.count,
+          currentPage: response.data.current_page,
+          numPages: response.data.num_pages
         }
       }));
+
+      return response.data;
     } catch (err) {
       console.error(`Erro ao carregar ${type}:`, err);
+      return null;
+    }
+  };
+
+  const getEndpoint = (type) => {
+    switch(type) {
+      case 'clients':
+        return 'clientes';
+      case 'sites':
+        return 'sites';
+      case 'equipments':
+        return 'equipamentos';
+      case 'services':
+        return 'servicos';
+      default:
+        return type;
     }
   };
 
