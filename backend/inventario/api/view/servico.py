@@ -1,33 +1,51 @@
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ...models import Servico
+from ...models import Cliente, Equipamento, GrupoEconomico, Servico, Site
 from ..serializers import ServicoSerializer
 
 
 class ServicoListCreate(APIView):
     def get(self, request):
         try:
-            cliente_id = request.query_params.get("cliente")
-            site_id = request.query_params.get("site")
-            equipamento_id = request.query_params.get(
-                "equipamento"
-            )  # Confirmar que está usando "equipamento"
+            grupo_economico_id = request.query_params.get("grupo_economico")
+            grupo_economico = get_object_or_404(
+                GrupoEconomico, pk=grupo_economico_id
+            )
 
-            if not cliente_id:
-                return Response(
-                    {"error": "Cliente é obrigatório"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            # Construir a query base
             servicos = Servico.objects.select_related(
                 "equipamento", "equipamento__site"
-            ).filter(equipamento__site__cliente_id=cliente_id)
+            ).filter(
+                equipamento__site__cliente__grupo_economico=grupo_economico
+            )
+
+            cliente_id = request.query_params.get("cliente")
+            if cliente_id:
+                cliente = get_object_or_404(
+                    Cliente, pk=cliente_id, grupo_economico=grupo_economico
+                )
+                servicos = servicos.filter(equipamento__site__cliente=cliente)
+
+            site_id = request.query_params.get("site")
+            if site_id:
+                site = get_object_or_404(
+                    Site, pk=site_id, cliente__grupo_economico=grupo_economico
+                )
+                servicos = servicos.filter(equipamento__site=site)
+
+            equipamento_id = request.query_params.get("equipamento")
+            if equipamento_id:
+                equipamento = get_object_or_404(
+                    Equipamento,
+                    pk=equipamento_id,
+                    site__cliente__grupo_economico=grupo_economico,
+                )
+                servicos = servicos.filter(equipamento=equipamento)
 
             # Debug para verificar os parâmetros recebidos
             print(f"Parâmetros recebidos na API: {request.query_params}")
@@ -47,13 +65,6 @@ class ServicoListCreate(APIView):
                     | Q(codigo__icontains=search)
                 )
 
-            # Debug dos filtros
-            print(f"Query SQL: {servicos.query}")
-            print(f"Total de serviços encontrados: {servicos.count()}")
-            print(
-                f"Parâmetros: cliente={cliente_id}, site={site_id}, equipamento={equipamento_id}"
-            )
-
             # Paginação dos resultados
             paginator = Paginator(servicos.distinct(), 50)
             page_number = request.query_params.get("page", 1)
@@ -67,6 +78,7 @@ class ServicoListCreate(APIView):
                     "current_page": page_obj.number,
                     "results": serializer.data,
                     "filters_applied": {
+                        "grupo_economico": grupo_economico_id,
                         "cliente": cliente_id,
                         "site": site_id,
                         "equipamento": equipamento_id,
@@ -96,10 +108,15 @@ class ServicoListCreate(APIView):
 
 class ServicoUpdate(APIView):
     def put(self, request, pk):
-        try:
-            servico = Servico.objects.get(pk=pk)
-        except Servico.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        grupo_economico_id = request.query_params.get("grupo_economico")
+        grupo_economico = get_object_or_404(
+            GrupoEconomico, pk=grupo_economico_id
+        )
+        servico = get_object_or_404(
+            Servico,
+            pk=pk,
+            equipamento__site__cliente__grupo_economico=grupo_economico,
+        )
 
         serializer = ServicoSerializer(servico, data=request.data)
         if serializer.is_valid():

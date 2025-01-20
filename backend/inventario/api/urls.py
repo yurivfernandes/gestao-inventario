@@ -35,4 +35,14 @@ urlpatterns = [
         view.ServicoUpdate.as_view(),
         name="servico-update",
     ),
+    path(
+        "grupos-economicos/",
+        view.GrupoEconomicoListCreate.as_view(),
+        name="grupo-economico-list-create",
+    ),
+    path(
+        "grupos-economicos/<int:pk>/",
+        view.GrupoEconomicoUpdate.as_view(),
+        name="grupo-economico-update",
+    ),
 ]
