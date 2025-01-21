@@ -58,13 +58,29 @@ nav:
               - Migrations: backend/modulos/inventario/migrations.md
               - Inicialização: backend/modulos/inventario/init.md
   - Frontend:
+      - Visão Geral: frontend/index.md
       - Páginas:
-          - Login: frontend/paginas/login.md
-          - Welcome: frontend/paginas/welcome.md
-          - Inventário: frontend/paginas/inventario.md
-          - Incidentes: frontend/paginas/incidentes.md
-      - Componentes: frontend/componentes.md
-      - Estilos CSS: frontend/estilos.md
+          - Visão Geral: frontend/páginas/index.md
+          - Autenticação:
+              - Login: frontend/páginas/paginas/login.md
+              - Password: frontend/páginas/paginas/password.md
+              - Welcome: frontend/páginas/paginas/welcome.md
+          - Inventário:
+              - Visão Tabular: frontend/páginas/paginas/inventario.md
+              - Visão em Fluxo: frontend/páginas/paginas/inventario-flow.md
+              - Componentes:
+                  - Tabela: frontend/componentes/tables/inventory-table.md
+                  - Filtros: frontend/componentes/dropdown/filter-dropdown.md
+                  - Cards de Fluxo: frontend/componentes/flow/flow-cards.md
+                  - Seções de Fluxo: frontend/componentes/flow/flow-sections.md
+          - Incidentes:
+              - Visão Geral: frontend/páginas/paginas/incidentes.md
+              - Componentes:
+                  - Tabela: frontend/componentes/tables/incident-table.md
+                  - Filtros: frontend/componentes/filtros/incident-filter.md
+      - Componentes:
+          - Header:
+              - Visão Geral: frontend/componentes/header/header.md
 
 theme:
   name: material
