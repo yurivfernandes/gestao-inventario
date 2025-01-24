@@ -45,4 +45,29 @@ urlpatterns = [
         view.GrupoEconomicoUpdate.as_view(),
         name="grupo-economico-update",
     ),
+    # URLs para Link
+    path("links/", view.LinkListCreate.as_view(), name="link-list-create"),
+    path("links/<int:pk>/", view.LinkUpdate.as_view(), name="link-update"),
+    # URLs para Contrato
+    path(
+        "contratos/",
+        view.ContratoListCreate.as_view(),
+        name="contrato-list-create",
+    ),
+    path(
+        "contratos/<int:pk>/",
+        view.ContratoUpdate.as_view(),
+        name="contrato-update",
+    ),
+    # URLs para Licença
+    path(
+        "licencas/",
+        view.LicencaListCreate.as_view(),
+        name="licenca-list-create",
+    ),
+    path(
+        "licencas/<int:pk>/",
+        view.LicencaUpdate.as_view(),
+        name="licenca-update",
+    ),
 ]

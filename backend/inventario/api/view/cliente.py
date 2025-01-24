@@ -72,15 +72,14 @@ class ClienteUpdate(APIView):
     permission_classes = [IsAuthenticated]
 
     def put(self, request, pk):
-        grupo_economico_id = request.query_params.get("grupo_economico")
-        grupo_economico = get_object_or_404(
-            GrupoEconomico, pk=grupo_economico_id
-        )
-        cliente = get_object_or_404(
-            Cliente, pk=pk, grupo_economico=grupo_economico
-        )
+        cliente = get_object_or_404(Cliente, pk=pk)
 
-        serializer = ClienteSerializer(cliente, data=request.data)
+        # Remove o grupo_economico do request.data se presente
+        data = request.data.copy()
+        if "grupo_economico" in data:
+            del data["grupo_economico"]
+
+        serializer = ClienteSerializer(cliente, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

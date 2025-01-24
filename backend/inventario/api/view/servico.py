@@ -62,7 +62,10 @@ class ServicoListCreate(APIView):
             if search:
                 servicos = servicos.filter(
                     Q(designador__icontains=search)
-                    | Q(codigo__icontains=search)
+                    | Q(servico_num__icontains=search)
+                    | Q(oferta__icontains=search)
+                    | Q(operadora__icontains=search)
+                    | Q(ip__icontains=search)
                 )
 
             # Paginação dos resultados
@@ -108,17 +111,13 @@ class ServicoListCreate(APIView):
 
 class ServicoUpdate(APIView):
     def put(self, request, pk):
-        grupo_economico_id = request.query_params.get("grupo_economico")
-        grupo_economico = get_object_or_404(
-            GrupoEconomico, pk=grupo_economico_id
-        )
-        servico = get_object_or_404(
-            Servico,
-            pk=pk,
-            equipamento__site__cliente__grupo_economico=grupo_economico,
-        )
+        servico = get_object_or_404(Servico, pk=pk)
 
-        serializer = ServicoSerializer(servico, data=request.data)
+        data = request.data.copy()
+        if "equipamento" in data:
+            del data["equipamento"]
+
+        serializer = ServicoSerializer(servico, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

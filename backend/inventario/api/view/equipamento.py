@@ -76,19 +76,16 @@ class EquipamentoListCreate(APIView):
 
 class EquipamentoUpdate(APIView):
     def put(self, request, pk):
-        grupo_economico_id = request.query_params.get("grupo_economico")
-        grupo_economico = get_object_or_404(
-            GrupoEconomico, pk=grupo_economico_id
-        )
-        equipamento = get_object_or_404(
-            Equipamento, pk=pk, site__cliente__grupo_economico=grupo_economico
-        )
-        try:
-            equipamento = Equipamento.objects.get(pk=pk)
-        except Equipamento.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        equipamento = get_object_or_404(Equipamento, pk=pk)
 
-        serializer = EquipamentoSerializer(equipamento, data=request.data)
+        # Remove o site do request.data se presente
+        data = request.data.copy()
+        if "site" in data:
+            del data["site"]
+
+        serializer = EquipamentoSerializer(
+            equipamento, data=data, partial=True
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

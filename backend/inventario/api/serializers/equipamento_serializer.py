@@ -13,9 +13,15 @@ class EquipamentoSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "site",
-            "codigo",
-            "status",
-            "designador",
             "tipo",
+            "status",
+            "fornecedor",
+            "modelo",
+            "serial_number",
+            "redundancia",
+            "hw_end_life_cycle",
+            "hw_end_support",
+            "sw_end_life_cycle",
+            "sw_end_support",
             "site_codigo_vivo",
         ]

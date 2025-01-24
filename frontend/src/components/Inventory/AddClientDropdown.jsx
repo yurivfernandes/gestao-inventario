@@ -13,7 +13,8 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
     cnpj: '',
     vantive_id: '',
     codigo: '',
-    status: true
+    status: true,
+    status_vantive: 'Faturável'
   });
   
   const [errors, setErrors] = useState({});
@@ -139,7 +140,8 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
         cnpj: '',
         vantive_id: '',
         codigo: '',
-        status: true
+        status: true,
+        status_vantive: 'Faturável'
       });
       setErrors({});
     } catch (error) {
@@ -262,6 +264,19 @@ function AddClientDropdown({ isOpen, onClose, onSuccess }) {
           >
             <option value={true}>Ativo</option>
             <option value={false}>Inativo</option>
+          </select>
+        </div>
+
+        <div className="inv-filter-field">
+          <label className="inv-filter-label">Status Vantive</label>
+          <select
+            className="inv-filter-input"
+            name="status_vantive"
+            value={formData.status_vantive}
+            onChange={handleInputChange}
+          >
+            <option value="Faturável">Faturável</option>
+            <option value="Técnico">Técnico</option>
           </select>
         </div>
       </div>

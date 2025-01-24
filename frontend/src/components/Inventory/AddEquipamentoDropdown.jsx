@@ -5,37 +5,51 @@ import '../../styles/FilterDropdown.css';
 
 function AddEquipamentoDropdown({ isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
+    grupo_economico: '',  // Novo campo
+    cliente: '',
     site: '',
-    codigo: '',
-    designador: '',
     tipo: '',
-    status: true
+    status: true,
+    fornecedor: '',
+    modelo: '',
+    serial_number: '',
+    redundancia: false,
+    hw_end_life_cycle: '',
+    hw_end_support: '',
+    sw_end_life_cycle: '',
+    sw_end_support: ''
   });
   
+  const [gruposEconomicos, setGruposEconomicos] = useState([]);
   const [clients, setClients] = useState([]);
   const [sites, setSites] = useState([]);
-  const [filteredSites, setFilteredSites] = useState([]);
-  const [selectedClient, setSelectedClient] = useState(null);
+  const [grupoSearchTerm, setGrupoSearchTerm] = useState('');
   const [clientSearchTerm, setClientSearchTerm] = useState('');
   const [siteSearchTerm, setSiteSearchTerm] = useState('');
+  const [isGrupoDropdownOpen, setIsGrupoDropdownOpen] = useState(false);
   const [isClientDropdownOpen, setIsClientDropdownOpen] = useState(false);
   const [isSiteDropdownOpen, setIsSiteDropdownOpen] = useState(false);
+  const [isRedundanciaDropdownOpen, setIsRedundanciaDropdownOpen] = useState(false);
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    fetchClients();
+    fetchGruposEconomicos();
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   useEffect(() => {
-    if (selectedClient) {
-      // Agora só busca sites quando o cliente é selecionado
-      fetchSitesByClient(selectedClient);
-    } else {
-      setFilteredSites([]);
+    if (formData.grupo_economico) {
+      fetchClients(formData.grupo_economico);
     }
-  }, [selectedClient]);
+  }, [formData.grupo_economico]);
+
+  useEffect(() => {
+    if (formData.cliente) {
+      fetchSites(formData.cliente);
+    }
+  }, [formData.cliente]);
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -43,39 +57,58 @@ function AddEquipamentoDropdown({ isOpen, onClose, onSuccess }) {
     }
   };
 
-  const fetchClients = async () => {
+  const fetchGruposEconomicos = async () => {
     try {
-      const response = await api.get('/inventario/clientes/');
+      const response = await api.get('/inventario/grupos-economicos/');
+      setGruposEconomicos(response.data.results);
+    } catch (error) {
+      console.error('Erro ao carregar grupos econômicos:', error);
+    }
+  };
+
+  const fetchClients = async (grupoEconomicoId) => {
+    try {
+      const response = await api.get(`/inventario/clientes/`, {
+        params: {
+          grupo_economico: grupoEconomicoId,
+          status: true
+        }
+      });
       setClients(response.data.results);
     } catch (error) {
       console.error('Erro ao carregar clientes:', error);
     }
   };
 
-  const fetchSitesByClient = async (clientId) => {
+  const fetchSites = async (clienteId) => {
     try {
-      // Simplificando a chamada para buscar apenas por cliente
-      const response = await api.get(`/inventario/sites/?cliente=${clientId}`);
-      setFilteredSites(response.data.results);
+      const response = await api.get('/inventario/sites/', {
+        params: {
+          cliente: clienteId,  // Modificado de cliente__id para cliente
+          grupo_economico: formData.grupo_economico, // Adicionando grupo_economico
+          status: true
+        }
+      });
+      setSites(response.data.results || []);
     } catch (error) {
       console.error('Erro ao carregar sites:', error);
-      setFilteredSites([]);
     }
   };
 
   const handleClientSelect = (client) => {
-    setSelectedClient(client.id);
+    setFormData(prev => ({
+      ...prev,
+      cliente: client.id,
+      site: ''
+    }));
     setClientSearchTerm(client.razao_social);
     setIsClientDropdownOpen(false);
     setSiteSearchTerm('');
-    setFormData(prev => ({ ...prev, site: '' }));
-    // Chama API para buscar sites do cliente selecionado
-    fetchSitesByClient(client.id);
   };
 
   const handleSiteSelect = (site) => {
     setFormData(prev => ({ ...prev, site: site.id }));
-    setSiteSearchTerm(`${site.codigo_vivo} - ${site.codigo_sys_cliente}`);
+    setSiteSearchTerm(site.razao_social); // Alterado para usar razão social
     setIsSiteDropdownOpen(false);
   };
 
@@ -89,26 +122,50 @@ function AddEquipamentoDropdown({ isOpen, onClose, onSuccess }) {
 
   const handleSubmit = async () => {
     try {
-      const response = await api.post('/inventario/equipamentos/', {
-        ...formData,
-        cliente: selectedClient // Incluindo o cliente selecionado
+      // Remove grupo_economico e cliente do objeto antes de enviar
+      const { grupo_economico, cliente, ...dataToSend } = formData;
+      
+      const response = await api.post('/inventario/equipamentos/', dataToSend);
+      onSuccess(response.data);
+      setFormData({
+        grupo_economico: '',
+        cliente: '',
+        site: '',
+        tipo: '',
+        status: true,
+        fornecedor: '',
+        modelo: '',
+        serial_number: '',
+        redundancia: false,
+        hw_end_life_cycle: '',
+        hw_end_support: '',
+        sw_end_life_cycle: '',
+        sw_end_support: ''
       });
-      // Passa o objeto completo do equipamento criado para o callback de sucesso
-      onSuccess({
-        ...response.data,
-        cliente: selectedClient,
-        site: formData.site
-      });
-      // Reset do form...
     } catch (error) {
       console.error('Erro ao adicionar equipamento:', error);
     }
   };
 
+  const handleClearGrupo = () => {
+    setGrupoSearchTerm('');
+    setFormData(prev => ({ 
+      ...prev, 
+      grupo_economico: '',
+      cliente: '',
+      site: ''
+    }));
+    setClientSearchTerm('');
+    setSiteSearchTerm('');
+  };
+
   const handleClearClient = () => {
     setClientSearchTerm('');
-    setSelectedClient(null);
-    setFormData(prev => ({ ...prev, site: '' }));
+    setFormData(prev => ({ 
+      ...prev, 
+      cliente: '',
+      site: ''
+    }));
     setSiteSearchTerm('');
   };
 
@@ -125,6 +182,59 @@ function AddEquipamentoDropdown({ isOpen, onClose, onSuccess }) {
         <h3>Adicionar Equipamento</h3>
       </div>
       <div className="inv-filter-content">
+        {/* Grupo Econômico Dropdown */}
+        <div className="inv-filter-field">
+          <label className="inv-filter-label">Grupo Econômico</label>
+          <div className="search-input-container">
+            <input
+              className="inv-filter-input"
+              type="text"
+              value={grupoSearchTerm}
+              onChange={(e) => {
+                setGrupoSearchTerm(e.target.value);
+                setIsGrupoDropdownOpen(true);
+              }}
+              onFocus={() => setIsGrupoDropdownOpen(true)}
+              placeholder="Pesquisar grupo econômico..."
+            />
+            {grupoSearchTerm && (
+              <button className="clear-input-button" onClick={handleClearGrupo}>
+                <FaTimesCircle />
+              </button>
+            )}
+          </div>
+          {isGrupoDropdownOpen && (
+            <div className="inv-client-dropdown">
+              {gruposEconomicos
+                .filter(grupo => 
+                  grupo.razao_social.toLowerCase().includes(grupoSearchTerm.toLowerCase())
+                )
+                .map(grupo => (
+                  <div
+                    key={grupo.id}
+                    className="inv-client-option"
+                    onClick={() => {
+                      setFormData(prev => ({
+                        ...prev,
+                        grupo_economico: grupo.id,
+                        cliente: '',
+                        site: ''
+                      }));
+                      setGrupoSearchTerm(grupo.razao_social);
+                      setIsGrupoDropdownOpen(false);
+                      setClientSearchTerm('');
+                      setSiteSearchTerm('');
+                    }}
+                  >
+                    {grupo.razao_social}
+                  </div>
+                ))
+              }
+            </div>
+          )}
+        </div>
+
+        {/* Cliente Dropdown */}
         <div className="inv-filter-field">
           <label className="inv-filter-label">Cliente</label>
           <div className="search-input-container">
@@ -138,23 +248,19 @@ function AddEquipamentoDropdown({ isOpen, onClose, onSuccess }) {
               }}
               onFocus={() => setIsClientDropdownOpen(true)}
               placeholder="Pesquisar cliente..."
+              disabled={!formData.grupo_economico}
             />
             {clientSearchTerm && (
-              <button
-                className="clear-input-button"
-                onClick={handleClearClient}
-                type="button"
-              >
+              <button className="clear-input-button" onClick={handleClearClient}>
                 <FaTimesCircle />
               </button>
             )}
           </div>
-          {isClientDropdownOpen && (
+          {isClientDropdownOpen && formData.grupo_economico && (
             <div className="inv-client-dropdown">
               {clients
                 .filter(client => 
-                  client.razao_social.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
-                  client.codigo.toLowerCase().includes(clientSearchTerm.toLowerCase())
+                  client.razao_social.toLowerCase().includes(clientSearchTerm.toLowerCase())
                 )
                 .map(client => (
                   <div
@@ -162,7 +268,7 @@ function AddEquipamentoDropdown({ isOpen, onClose, onSuccess }) {
                     className="inv-client-option"
                     onClick={() => handleClientSelect(client)}
                   >
-                    {client.razao_social} ({client.codigo})
+                    {client.razao_social}
                   </div>
                 ))
               }
@@ -170,6 +276,7 @@ function AddEquipamentoDropdown({ isOpen, onClose, onSuccess }) {
           )}
         </div>
 
+        {/* Site Dropdown */}
         <div className="inv-filter-field">
           <label className="inv-filter-label">Site</label>
           <div className="search-input-container">
@@ -183,24 +290,19 @@ function AddEquipamentoDropdown({ isOpen, onClose, onSuccess }) {
               }}
               onFocus={() => setIsSiteDropdownOpen(true)}
               placeholder="Pesquisar site..."
-              disabled={!selectedClient}
+              disabled={!formData.cliente}
             />
             {siteSearchTerm && (
-              <button
-                className="clear-input-button"
-                onClick={handleClearSite}
-                type="button"
-              >
+              <button className="clear-input-button" onClick={handleClearSite}>
                 <FaTimesCircle />
               </button>
             )}
           </div>
-          {isSiteDropdownOpen && selectedClient && (
+          {isSiteDropdownOpen && formData.cliente && (
             <div className="inv-client-dropdown">
-              {filteredSites
+              {sites
                 .filter(site => 
-                  site.codigo_vivo.toLowerCase().includes(siteSearchTerm.toLowerCase()) ||
-                  site.codigo_sys_cliente.toLowerCase().includes(siteSearchTerm.toLowerCase())
+                  site.razao_social.toLowerCase().includes(siteSearchTerm.toLowerCase())
                 )
                 .map(site => (
                   <div
@@ -208,36 +310,12 @@ function AddEquipamentoDropdown({ isOpen, onClose, onSuccess }) {
                     className="inv-client-option"
                     onClick={() => handleSiteSelect(site)}
                   >
-                    {site.codigo_vivo} - {site.codigo_sys_cliente}
+                    {site.razao_social} ({site.codigo_vivo})
                   </div>
                 ))
               }
             </div>
           )}
-        </div>
-
-        <div className="inv-filter-field">
-          <label className="inv-filter-label">Código</label>
-          <input
-            className="inv-filter-input"
-            type="text"
-            name="codigo"
-            value={formData.codigo}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-
-        <div className="inv-filter-field">
-          <label className="inv-filter-label">Designador</label>
-          <input
-            className="inv-filter-input"
-            type="text"
-            name="designador"
-            value={formData.designador}
-            onChange={handleInputChange}
-            required
-          />
         </div>
 
         <div className="inv-filter-field">
@@ -253,16 +331,153 @@ function AddEquipamentoDropdown({ isOpen, onClose, onSuccess }) {
         </div>
 
         <div className="inv-filter-field">
-          <label className="inv-filter-label">Status</label>
-          <select
+          <label className="inv-filter-label">Fornecedor</label>
+          <input
             className="inv-filter-input"
-            name="status"
-            value={formData.status}
+            type="text"
+            name="fornecedor"
+            value={formData.fornecedor}
             onChange={handleInputChange}
-          >
-            <option value={true}>Ativo</option>
-            <option value={false}>Inativo</option>
-          </select>
+            required
+          />
+        </div>
+
+        <div className="inv-filter-field">
+          <label className="inv-filter-label">Modelo</label>
+          <input
+            className="inv-filter-input"
+            type="text"
+            name="modelo"
+            value={formData.modelo}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+
+        <div className="inv-filter-field">
+          <label className="inv-filter-label">Número de Série</label>
+          <input
+            className="inv-filter-input"
+            type="text"
+            name="serial_number"
+            value={formData.serial_number}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+
+        <div className="inv-filter-field">
+          <label className="inv-filter-label">Redundância</label>
+          <div className="search-input-container">
+            <input
+              className="inv-filter-input"
+              type="text"
+              value={formData.redundancia ? "Sim" : "Não"}
+              onClick={() => setIsRedundanciaDropdownOpen(!isRedundanciaDropdownOpen)}
+              readOnly
+            />
+          </div>
+          {isRedundanciaDropdownOpen && (
+            <div className="inv-client-dropdown">
+              <div 
+                className="inv-client-option"
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, redundancia: true }));
+                  setIsRedundanciaDropdownOpen(false);
+                }}
+              >
+                Sim
+              </div>
+              <div 
+                className="inv-client-option"
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, redundancia: false }));
+                  setIsRedundanciaDropdownOpen(false);
+                }}
+              >
+                Não
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="inv-filter-field">
+          <label className="inv-filter-label">Status</label>
+          <div className="search-input-container">
+            <input
+              className="inv-filter-input"
+              type="text"
+              value={formData.status ? "Ativo" : "Inativo"}
+              onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+              readOnly
+            />
+          </div>
+          {isStatusDropdownOpen && (
+            <div className="inv-client-dropdown">
+              <div 
+                className="inv-client-option"
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, status: true }));
+                  setIsStatusDropdownOpen(false);
+                }}
+              >
+                Ativo
+              </div>
+              <div 
+                className="inv-client-option"
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, status: false }));
+                  setIsStatusDropdownOpen(false);
+                }}
+              >
+                Inativo
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="inv-filter-field">
+          <label className="inv-filter-label">Fim de Vida HW</label>
+          <input
+            className="inv-filter-input"
+            type="date"
+            name="hw_end_life_cycle"
+            value={formData.hw_end_life_cycle}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="inv-filter-field">
+          <label className="inv-filter-label">Fim de Suporte HW</label>
+          <input
+            className="inv-filter-input"
+            type="date"
+            name="hw_end_support"
+            value={formData.hw_end_support}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="inv-filter-field">
+          <label className="inv-filter-label">Fim de Vida SW</label>
+          <input
+            className="inv-filter-input"
+            type="date"
+            name="sw_end_life_cycle"
+            value={formData.sw_end_life_cycle}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="inv-filter-field">
+          <label className="inv-filter-label">Fim de Suporte SW</label>
+          <input
+            className="inv-filter-input"
+            type="date"
+            name="sw_end_support"
+            value={formData.sw_end_support}
+            onChange={handleInputChange}
+          />
         </div>
       </div>
 
