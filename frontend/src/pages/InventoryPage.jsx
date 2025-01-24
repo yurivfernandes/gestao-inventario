@@ -11,13 +11,19 @@ import AddSiteDropdown from '../components/Inventory/AddSiteDropdown';
 import AddEquipamentoDropdown from '../components/Inventory/AddEquipamentoDropdown';
 import AddServicoDropdown from '../components/Inventory/AddServicoDropdown';
 import AddGrupoEconomicoDropdown from '../components/Inventory/AddGrupoEconomicoDropdown';
+import AddLinkDropdown from '../components/Inventory/AddLinkDropdown';
+import AddContratoDropdown from '../components/Inventory/AddContratoDropdown';
+import AddLicencaDropdown from '../components/Inventory/AddLicencaDropdown';
 
 const tabs = [
   { id: 'economic_groups', label: 'Grupos Econômicos' },
   { id: 'clients', label: 'Clientes' },
   { id: 'sites', label: 'Sites' },
   { id: 'equipments', label: 'Equipamentos' },
-  { id: 'services', label: 'Serviços' }
+  { id: 'services', label: 'Serviços' },
+  { id: 'links', label: 'Links' },
+  { id: 'contratos', label: 'Contratos' },
+  { id: 'licencas', label: 'Licenças' }
 ];
 
 function InventoryPage() {
@@ -30,7 +36,10 @@ function InventoryPage() {
     clients: [],
     sites: [],
     equipments: [],
-    services: []
+    services: [],
+    links: [],
+    contratos: [],
+    licencas: []
   });
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState({
@@ -38,7 +47,10 @@ function InventoryPage() {
     clients: 1,
     sites: 1,
     equipments: 1,
-    services: 1
+    services: 1,
+    links: 1,
+    contratos: 1,
+    licencas: 1
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -46,6 +58,9 @@ function InventoryPage() {
   const [isAddEquipamentoOpen, setIsAddEquipamentoOpen] = useState(false);
   const [isAddServicoOpen, setIsAddServicoOpen] = useState(false);
   const [isAddGrupoEconomicoOpen, setIsAddGrupoEconomicoOpen] = useState(false);
+  const [isAddLinkOpen, setIsAddLinkOpen] = useState(false);
+  const [isAddContratoOpen, setIsAddContratoOpen] = useState(false);
+  const [isAddLicencaOpen, setIsAddLicencaOpen] = useState(false);
 
   const fetchData = async (type, page = 1) => {
     try {
@@ -115,6 +130,36 @@ function InventoryPage() {
           setTableData(prev => ({ ...prev, services: response.data.results }));
           setTotalPages(prev => ({ ...prev, services: response.data.num_pages }));
           break;
+        case 'links':
+          if (!filters.grupo_economico) {
+            setTableData(prev => ({ ...prev, links: [] }));
+            setTotalPages(prev => ({ ...prev, links: 1 }));
+            return;
+          }
+          response = await api.get(`/inventario/links/?${queryString}`);
+          setTableData(prev => ({ ...prev, links: response.data.results }));
+          setTotalPages(prev => ({ ...prev, links: response.data.num_pages }));
+          break;
+        case 'contratos':
+          if (!filters.grupo_economico) {
+            setTableData(prev => ({ ...prev, contratos: [] }));
+            setTotalPages(prev => ({ ...prev, contratos: 1 }));
+            return;
+          }
+          response = await api.get(`/inventario/contratos/?${queryString}`);
+          setTableData(prev => ({ ...prev, contratos: response.data.results }));
+          setTotalPages(prev => ({ ...prev, contratos: response.data.num_pages }));
+          break;
+        case 'licencas':
+          if (!filters.grupo_economico) {
+            setTableData(prev => ({ ...prev, licencas: [] }));
+            setTotalPages(prev => ({ ...prev, licencas: 1 }));
+            return;
+          }
+          response = await api.get(`/inventario/licencas/?${queryString}`);
+          setTableData(prev => ({ ...prev, licencas: response.data.results }));
+          setTotalPages(prev => ({ ...prev, licencas: response.data.num_pages }));
+          break;
         default:
           break;
       }
@@ -175,6 +220,21 @@ function InventoryPage() {
   const handleGrupoEconomicoSuccess = (novoGrupoEconomico) => {
     setIsAddGrupoEconomicoOpen(false);
     setFilters({ grupo_economico: novoGrupoEconomico.id });
+    fetchData(activeTab, currentPage);
+  };
+
+  const handleLinkSuccess = (newLink) => {
+    setIsAddLinkOpen(false);
+    fetchData(activeTab, currentPage);
+  };
+
+  const handleContratoSuccess = (newContrato) => {
+    setIsAddContratoOpen(false);
+    fetchData(activeTab, currentPage);
+  };
+
+  const handleLicencaSuccess = (newLicenca) => {
+    setIsAddLicencaOpen(false);
     fetchData(activeTab, currentPage);
   };
 
@@ -253,6 +313,33 @@ function InventoryPage() {
               </div>
             )}
 
+            {activeTab === 'links' && (
+              <button 
+                className="action-button"
+                onClick={() => setIsAddLinkOpen(!isAddLinkOpen)}
+              >
+                <FaPlus /> Adicionar Link
+              </button>
+            )}
+
+            {activeTab === 'contratos' && (
+              <button 
+                className="action-button"
+                onClick={() => setIsAddContratoOpen(!isAddContratoOpen)}
+              >
+                <FaPlus /> Adicionar Contrato
+              </button>
+            )}
+
+            {activeTab === 'licencas' && (
+              <button 
+                className="action-button"
+                onClick={() => setIsAddLicencaOpen(!isAddLicencaOpen)}
+              >
+                <FaPlus /> Adicionar Licença
+              </button>
+            )}
+
             <button 
               className="filter-button"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -312,6 +399,30 @@ function InventoryPage() {
                 isOpen={isAddGrupoEconomicoOpen}
                 onClose={() => setIsAddGrupoEconomicoOpen(false)}
                 onSuccess={handleGrupoEconomicoSuccess}
+              />
+            )}
+
+            {isAddLinkOpen && (
+              <AddLinkDropdown
+                isOpen={isAddLinkOpen}
+                onClose={() => setIsAddLinkOpen(false)}
+                onSuccess={handleLinkSuccess}
+              />
+            )}
+
+            {isAddContratoOpen && (
+              <AddContratoDropdown
+                isOpen={isAddContratoOpen}
+                onClose={() => setIsAddContratoOpen(false)}
+                onSuccess={handleContratoSuccess}
+              />
+            )}
+
+            {isAddLicencaOpen && (
+              <AddLicencaDropdown
+                isOpen={isAddLicencaOpen}
+                onClose={() => setIsAddLicencaOpen(false)}
+                onSuccess={handleLicencaSuccess}
               />
             )}
           </div>

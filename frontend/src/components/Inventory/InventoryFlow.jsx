@@ -98,7 +98,7 @@ const ItemCard = ({ item, type, selected, onSelect }) => {
       break;
 
     case 'site':
-      Icon = getBusinessIcon(item.tipo_negocio);
+      Icon = MdBusiness;
       content = (
         <>
           <span className={`item-status ${statusClass}`}>
@@ -109,17 +109,17 @@ const ItemCard = ({ item, type, selected, onSelect }) => {
               <Icon size={24} />
             </div>
             <div className="header-content">
-              <h4 className={statusClass}>{item.codigo_vivo}</h4>
+              <h4 className={statusClass}>{item.razao_social}</h4>
               <div className="site-codes">
-                <span>{item.tipo_negocio}</span>
+                <span>{item.cnpj}</span>
               </div>
             </div>
           </div>
           <div className="card-details">
             <span className="detail-label">Tipo Site:</span>
             <span className="detail-value">{item.tipo_site}</span>
-            <span className="detail-label">CEP:</span>
-            <span className="detail-value">{item.cep}</span>
+            <span className="detail-label">Código Vivo:</span>
+            <span className="detail-value">{item.codigo_vivo}</span>
             <span className="detail-label">Código Sistema:</span>
             <span className="detail-value">{item.codigo_sys_cliente}</span>
           </div>
@@ -139,14 +139,17 @@ const ItemCard = ({ item, type, selected, onSelect }) => {
               <Icon size={24} />
             </div>
             <div className="header-content">
-              <h4 className={statusClass}>{item.designador}</h4>
+              <h4 className={statusClass}>{item.modelo}</h4>
+              <span className="subtitle">{item.tipo}</span>
             </div>
           </div>
           <div className="card-details">
-            <span className="detail-label">Tipo:</span>
-            <span className="detail-value">{item.tipo}</span>
-            <span className="detail-label">Código:</span>
-            <span className="detail-value">{item.codigo}</span>
+            <span className="detail-label">Fornecedor:</span>
+            <span className="detail-value">{item.fornecedor}</span>
+            <span className="detail-label">Série:</span>
+            <span className="detail-value">{item.serial_number}</span>
+            <span className="detail-label">Redundância:</span>
+            <span className="detail-value">{item.redundancia ? 'Sim' : 'Não'}</span>
           </div>
         </>
       );
@@ -164,16 +167,17 @@ const ItemCard = ({ item, type, selected, onSelect }) => {
               <Icon size={24} />
             </div>
             <div className="header-content">
-              <h4 className={statusClass}>{item.designador || 'Sem designador'}</h4>
+              <h4 className={statusClass}>{item.designador}</h4>
+              <span className="subtitle">{item.servico_num}</span>
             </div>
           </div>
           <div className="card-details">
-            <span className="detail-label">Designador:</span>
-            <span className="detail-value">{item.designador || '-'}</span>
-            <span className="detail-label">Tipo:</span>
-            <span className="detail-value">{item.tipo}</span>
-            <span className="detail-label">Código:</span>
-            <span className="detail-value">{item.codigo}</span>
+            <span className="detail-label">Oferta:</span>
+            <span className="detail-value">{item.oferta}</span>
+            <span className="detail-label">Operadora:</span>
+            <span className="detail-value">{item.operadora}</span>
+            <span className="detail-label">IP:</span>
+            <span className="detail-value">{item.ip}</span>
           </div>
         </>
       );
