@@ -4,8 +4,7 @@ from .equipamento import Equipamento
 
 
 class Servico(models.Model):
-    equipamento = models.ForeignKey(Equipamento, on_delete=models.CASCADE)
-    designador = models.CharField(max_length=50)
+    equipamento = models.OneToOneField(Equipamento, on_delete=models.CASCADE)
     servico_num = models.CharField(max_length=50)
     oferta = models.CharField(max_length=100)
     pacote = models.CharField(max_length=100)
